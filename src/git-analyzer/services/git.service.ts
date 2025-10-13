@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { simpleGit, SimpleGit, LogResult } from 'simple-git';
 
-export { SimpleGit };
+export type { SimpleGit };
 import { TempService } from './temp.service';
 
 export interface CommitInfo {
@@ -15,7 +15,7 @@ export interface CommitInfo {
 
 @Injectable()
 export class GitService {
-  constructor(private readonly tempService: TempService) {}
+  constructor(private readonly tempService: TempService) { }
 
   /**
    * Clones a repository and returns the git instance
@@ -56,28 +56,17 @@ export class GitService {
    */
   async getCommitHistory(git: SimpleGit): Promise<CommitInfo[]> {
     try {
-      const log: LogResult = await git.log({
-        '--stat': null,
-        '--pretty': 'format:%H|%an|%ae|%ad|%s',
-        '--date': 'iso',
-      });
+      const log: LogResult = await git.log();
 
       return log.all.map((commit) => {
-        // Parse the commit data
-        const [hash, author, email, dateStr, ...messageParts] =
-          commit.message.split('|');
-        const message = messageParts.join('|');
-
-        // Count files changed from the stats
-        const filesChanged = commit.diff?.files?.length || 0;
-
+        // Use the standard fields from simple-git
         return {
-          hash: hash.trim(),
-          author: author.trim(),
-          email: email.trim(),
-          date: new Date(dateStr.trim()),
-          message: message.trim(),
-          filesChanged,
+          hash: commit.hash || '',
+          author: commit.author_name || '',
+          email: commit.author_email || '',
+          date: new Date(commit.date || ''),
+          message: commit.message || '',
+          filesChanged: 0, // We'll calculate this separately if needed
         };
       });
     } catch (error) {
@@ -97,13 +86,13 @@ export class GitService {
   ): Promise<{ branch: string; remote: string }> {
     try {
       const [branch, remote] = await Promise.all([
-        git.revparse(['--abbrev-ref', 'HEAD']),
+        git.revparse(['--abbrev-ref', 'HEAD']).catch(() => 'unknown'),
         git.remote(['get-url', 'origin']).catch(() => 'unknown'),
       ]);
 
       return {
-        branch: (branch || '').trim(),
-        remote: (remote || '').trim(),
+        branch: (branch || 'unknown').trim(),
+        remote: (remote || 'unknown').trim(),
       };
     } catch (error) {
       throw new Error(

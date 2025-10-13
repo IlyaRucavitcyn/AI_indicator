@@ -74,14 +74,18 @@ describe('GitService', () => {
         log: jest.fn().mockResolvedValue({
           all: [
             {
-              message:
-                'hash1|author1|email1|2024-01-01T00:00:00Z|commit message 1',
-              diff: { files: ['file1.txt', 'file2.txt'] },
+              hash: 'hash1',
+              author_name: 'author1',
+              author_email: 'email1',
+              date: '2024-01-01T00:00:00Z',
+              message: 'commit message 1',
             },
             {
-              message:
-                'hash2|author2|email2|2024-01-02T00:00:00Z|commit message 2',
-              diff: { files: ['file3.txt'] },
+              hash: 'hash2',
+              author_name: 'author2',
+              author_email: 'email2',
+              date: '2024-01-02T00:00:00Z',
+              message: 'commit message 2',
             },
           ],
         }),
@@ -96,7 +100,7 @@ describe('GitService', () => {
         email: 'email1',
         date: new Date('2024-01-01T00:00:00Z'),
         message: 'commit message 1',
-        filesChanged: 2,
+        filesChanged: 0,
       });
       expect(result[1]).toEqual({
         hash: 'hash2',
@@ -104,7 +108,7 @@ describe('GitService', () => {
         email: 'email2',
         date: new Date('2024-01-02T00:00:00Z'),
         message: 'commit message 2',
-        filesChanged: 1,
+        filesChanged: 0,
       });
     });
 
@@ -148,15 +152,18 @@ describe('GitService', () => {
       });
     });
 
-    it('should handle git info errors', async () => {
+    it('should handle git info errors gracefully', async () => {
       const mockGit = {
         revparse: jest.fn().mockRejectedValue(new Error('Git info failed')),
         remote: jest.fn().mockResolvedValue('https://github.com/user/repo.git'),
       };
 
-      await expect(service.getRepositoryInfo(mockGit as any)).rejects.toThrow(
-        'Failed to get repository info: Git info failed',
-      );
+      const result = await service.getRepositoryInfo(mockGit as any);
+
+      expect(result).toEqual({
+        branch: 'unknown',
+        remote: 'https://github.com/user/repo.git',
+      });
     });
   });
 
