@@ -1,98 +1,353 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Git Analyzer
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A powerful Git repository analysis tool that provides comprehensive metrics and insights about repository activity, contributors, and development patterns. Available as both a CLI tool and a REST API.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- **Comprehensive Repository Analysis**: Analyze any Git repository by URL
+- **Multiple Output Formats**: Console tables, JSON, HTML reports
+- **Detailed Metrics**: Commits, contributors, duration, activity patterns
+- **Dual Interface**: Command-line tool and REST API
+- **Branch Analysis**: Analyze specific branches
+- **Contributor Statistics**: Detailed breakdown by contributor
+- **Easy Integration**: Built with NestJS and TypeScript
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Metrics Provided
 
-## Project setup
+- Total number of commits
+- Number of contributors
+- First and last commit dates
+- Repository duration (in days)
+- Average commits per day
+- Top contributor identification
+- Detailed per-contributor statistics (name, email, commit count)
 
-```bash
-$ npm install
-```
+## Installation
 
-## Compile and run the project
+### Prerequisites
 
-```bash
-# development
-$ npm run start
+- Node.js 18.x or higher
+- npm or yarn
+- Git installed on your system
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
+### Install Dependencies
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Build the Project
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Build the entire project (API + CLI)
+npm run build
+
+# Build CLI specifically and make it executable
+npm run build:cli
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Quick Start
 
-## Resources
+### Using the CLI
 
-Check out a few resources that may come in handy when working with NestJS:
+After building, you can use the CLI tool:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+# Analyze a repository with console output
+npx git-analyzer analyze https://github.com/octocat/Hello-World.git
 
-## Support
+# Analyze a specific branch
+npx git-analyzer analyze https://github.com/octocat/Hello-World.git -b develop
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+# Output as JSON
+npx git-analyzer analyze https://github.com/octocat/Hello-World.git -f json
 
-## Stay in touch
+# Save JSON to file
+npx git-analyzer analyze https://github.com/octocat/Hello-World.git -f json -o report.json
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Generate HTML report
+npx git-analyzer analyze https://github.com/octocat/Hello-World.git -f html -o report.html
+
+# Generate all formats
+npx git-analyzer analyze https://github.com/octocat/Hello-World.git -f all
+```
+
+### Using the REST API
+
+Start the API server:
+
+```bash
+# Development mode with hot reload
+npm run start:dev
+
+# Production mode
+npm run start:prod
+```
+
+The API will be available at `http://localhost:3000`.
+
+## CLI Usage
+
+### Command Syntax
+
+```bash
+git-analyzer analyze <repository-url> [options]
+```
+
+### Options
+
+| Option | Alias | Description | Default |
+|--------|-------|-------------|---------|
+| `--branch <branch>` | `-b` | Branch to analyze | `main` |
+| `--format <format>` | `-f` | Output format (console, json, html, all) | `console` |
+| `--output <path>` | `-o` | Output file path (for json/html formats) | - |
+
+### Examples
+
+```bash
+# Basic analysis with console output
+git-analyzer analyze https://github.com/facebook/react.git
+
+# Analyze specific branch
+git-analyzer analyze https://github.com/facebook/react.git -b develop
+
+# JSON output to file
+git-analyzer analyze https://github.com/facebook/react.git -f json -o react-analysis.json
+
+# HTML report
+git-analyzer analyze https://github.com/facebook/react.git -f html -o react-report.html
+
+# All formats (console + JSON + HTML)
+git-analyzer analyze https://github.com/facebook/react.git -f all
+```
+
+## API Usage
+
+### Health Check
+
+**Endpoint:** `POST /git-analyzer/health`
+
+**Response:**
+```json
+{
+  "status": "ok",
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+```
+
+### Analyze Repository
+
+**Endpoint:** `POST /git-analyzer/analyze`
+
+**Request Body:**
+```json
+{
+  "repositoryUrl": "https://github.com/octocat/Hello-World.git",
+  "branch": "main",
+  "format": "json"
+}
+```
+
+**Response:**
+```json
+{
+  "repository": "octocat/Hello-World",
+  "branch": "main",
+  "metrics": {
+    "totalCommits": 125,
+    "contributors": 15,
+    "firstCommit": "2020-01-15T08:00:00.000Z",
+    "lastCommit": "2024-01-15T10:00:00.000Z",
+    "durationDays": 1461,
+    "avgCommitsPerDay": 0.09,
+    "topContributor": "john@example.com",
+    "contributorStats": [
+      {
+        "email": "john@example.com",
+        "name": "John Doe",
+        "commitCount": 45
+      },
+      {
+        "email": "jane@example.com",
+        "name": "Jane Smith",
+        "commitCount": 32
+      }
+    ]
+  },
+  "analyzedAt": "2024-01-15T10:30:00.000Z"
+}
+```
+
+### Using cURL
+
+```bash
+# Analyze a repository
+curl -X POST http://localhost:3000/git-analyzer/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "repositoryUrl": "https://github.com/octocat/Hello-World.git",
+    "branch": "main",
+    "format": "json"
+  }'
+
+# Health check
+curl -X POST http://localhost:3000/git-analyzer/health
+```
+
+### Using JavaScript/TypeScript
+
+```typescript
+const analyzeRepository = async (repoUrl: string, branch: string = 'main') => {
+  const response = await fetch('http://localhost:3000/git-analyzer/analyze', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      repositoryUrl: repoUrl,
+      branch: branch,
+      format: 'json',
+    }),
+  });
+
+  const data = await response.json();
+  return data;
+};
+
+// Usage
+const result = await analyzeRepository('https://github.com/octocat/Hello-World.git');
+console.log(result.metrics);
+```
+
+## Configuration
+
+### Environment Variables
+
+- `PORT`: API server port (default: `3000`)
+
+### Output Formats
+
+#### Console
+Formatted table output with colored text, displayed in the terminal.
+
+#### JSON
+Machine-readable JSON format, can be saved to file or returned by API.
+
+#### HTML
+Beautiful HTML report with styled tables and formatting, saved to file.
+
+#### All
+Generates console output, JSON file, and HTML file simultaneously.
+
+## Development
+
+### Running Tests
+
+```bash
+# Unit tests
+npm run test
+
+# E2E tests
+npm run test:e2e
+
+# Test coverage
+npm run test:cov
+
+# Watch mode
+npm run test:watch
+```
+
+### Linting and Formatting
+
+```bash
+# Run ESLint
+npm run lint
+
+# Format code with Prettier
+npm run format
+```
+
+### Development Mode
+
+```bash
+# Start API in watch mode
+npm run start:dev
+
+# Start with debugging
+npm run start:debug
+```
+
+## Project Structure
+
+```
+AI_indicator/
+├── src/
+│   ├── cli/                      # CLI tool
+│   │   ├── formatters/           # Output formatters
+│   │   │   ├── console.formatter.ts
+│   │   │   ├── json.formatter.ts
+│   │   │   └── html.formatter.ts
+│   │   └── index.ts              # CLI entry point
+│   ├── git-analyzer/             # Core analysis module
+│   │   ├── dto/                  # Data Transfer Objects
+│   │   │   ├── analyze-request.dto.ts
+│   │   │   └── analyze-response.dto.ts
+│   │   ├── services/             # Business logic
+│   │   │   ├── analyzer.service.ts
+│   │   │   ├── git.service.ts
+│   │   │   └── temp.service.ts
+│   │   ├── git-analyzer.controller.ts
+│   │   ├── git-analyzer.service.ts
+│   │   └── git-analyzer.module.ts
+│   ├── app.module.ts             # Root module
+│   └── main.ts                   # API entry point
+├── test/                         # E2E tests
+├── docs/                         # Documentation
+└── dist/                         # Compiled output
+```
+
+## Documentation
+
+- [API Reference](docs/API.md) - Detailed API documentation
+- [Architecture](docs/ARCHITECTURE.md) - System design and architecture
+- [Development Guide](docs/DEVELOPMENT.md) - Contributing and development setup
+
+## Technologies
+
+- **NestJS** - Progressive Node.js framework
+- **TypeScript** - Type-safe development
+- **simple-git** - Git operations
+- **Commander** - CLI framework
+- **chalk** - Terminal colors
+- **cli-table3** - Terminal tables
+- **class-validator** - DTO validation
+- **Jest** - Testing framework
+
+## Error Handling
+
+The tool provides clear error messages for common issues:
+
+- Invalid repository URLs
+- Network connectivity problems
+- Authentication failures
+- Missing or invalid branches
+- Repository access errors
+
+## Limitations
+
+- Requires Git to be installed on the system
+- Clones repositories temporarily (requires disk space)
+- Public repositories only (unless authentication is configured)
+- Large repositories may take time to clone and analyze
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+UNLICENSED - Private project
+
+## Support
+
+For issues, questions, or contributions, please refer to the [Development Guide](docs/DEVELOPMENT.md).
+
+## Version
+
+Current version: 0.0.1
