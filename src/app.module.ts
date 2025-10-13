@@ -8,4 +8,4 @@ import { GitAnalyzerModule } from './git-analyze/routes/git-analyzer.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

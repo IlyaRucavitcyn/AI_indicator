@@ -15,7 +15,7 @@ export interface CommitInfo {
 
 @Injectable()
 export class GitService {
-  constructor(private readonly tempService: TempService) { }
+  constructor(private readonly tempService: TempService) {}
 
   /**
    * Clones a repository and returns the git instance

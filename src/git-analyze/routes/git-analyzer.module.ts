@@ -10,4 +10,4 @@ import { TempService } from '../services/temp.service';
   providers: [GitAnalyzerService, AnalyzerService, GitService, TempService],
   exports: [GitAnalyzerService],
 })
-export class GitAnalyzerModule { }
+export class GitAnalyzerModule {}

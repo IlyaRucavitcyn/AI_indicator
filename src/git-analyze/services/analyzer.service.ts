@@ -12,7 +12,7 @@ export class AnalyzerService {
   constructor(
     private readonly gitService: GitService,
     private readonly tempService: TempService,
-  ) { }
+  ) {}
 
   /**
    * Analyzes a Git repository and returns metrics

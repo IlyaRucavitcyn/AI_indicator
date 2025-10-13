@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AnalyzerService } from './analyzer.service';
 import { GitService } from './git.service';
 import { TempService } from './temp.service';
-import { AnalyzeResponseDto } from '../routes/dto/analyze-response.dto';
 
 describe('AnalyzerService', () => {
   let service: AnalyzerService;
@@ -201,6 +200,7 @@ describe('AnalyzerService', () => {
       ];
 
       // Access private method for testing
+
       const metrics = (service as any).calculateMetrics(commits);
 
       expect(metrics.totalCommits).toBe(3);

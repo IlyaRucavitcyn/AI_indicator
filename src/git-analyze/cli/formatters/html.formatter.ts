@@ -1,15 +1,15 @@
 import { AnalyzeResponseDto } from '../../routes/dto/analyze-response.dto';
 
 export class HtmlFormatter {
-    /**
-     * Formats analysis results as HTML
-     * @param data Analysis results
-     * @returns HTML string
-     */
-    format(data: AnalyzeResponseDto): string {
-        const { repository, branch, metrics, analyzedAt } = data;
+  /**
+   * Formats analysis results as HTML
+   * @param data Analysis results
+   * @returns HTML string
+   */
+  format(data: AnalyzeResponseDto): string {
+    const { repository, branch, metrics, analyzedAt } = data;
 
-        return `<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -179,27 +179,27 @@ export class HtmlFormatter {
     </div>
 </body>
 </html>`;
+  }
+
+  private generateContributorsTable(metrics: {
+    contributorStats: any[];
+    totalCommits: number;
+  }): string {
+    if (metrics.contributorStats.length <= 1) {
+      return '';
     }
 
-    private generateContributorsTable(metrics: {
-        contributorStats: any[];
-        totalCommits: number;
-    }): string {
-        if (metrics.contributorStats.length <= 1) {
-            return '';
-        }
-
-        const contributorsRows = metrics.contributorStats
-            .map(
-                (
-                    contributor: { email: string; name: string; commitCount: number },
-                    index: number,
-                ) => {
-                    const percentage = (
-                        (contributor.commitCount / metrics.totalCommits) *
-                        100
-                    ).toFixed(1);
-                    return `
+    const contributorsRows = metrics.contributorStats
+      .map(
+        (
+          contributor: { email: string; name: string; commitCount: number },
+          index: number,
+        ) => {
+          const percentage = (
+            (contributor.commitCount / metrics.totalCommits) *
+            100
+          ).toFixed(1);
+          return `
           <tr>
             <td class="rank">#${index + 1}</td>
             <td>${contributor.email}</td>
@@ -208,11 +208,11 @@ export class HtmlFormatter {
             <td class="percentage">${percentage}%</td>
           </tr>
         `;
-                },
-            )
-            .join('');
+        },
+      )
+      .join('');
 
-        return `
+    return `
     <div class="contributors-table">
         <h3>👥 Contributors Breakdown</h3>
         <table>
@@ -230,5 +230,5 @@ export class HtmlFormatter {
             </tbody>
         </table>
     </div>`;
-    }
+  }
 }

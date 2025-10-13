@@ -5,7 +5,7 @@ import { AnalyzeResponseDto } from './dto/analyze-response.dto';
 
 @Injectable()
 export class GitAnalyzerService {
-  constructor(private readonly analyzerService: AnalyzerService) { }
+  constructor(private readonly analyzerService: AnalyzerService) {}
 
   /**
    * Analyzes a Git repository via API

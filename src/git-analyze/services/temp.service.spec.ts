@@ -76,6 +76,7 @@ describe('TempService', () => {
       service.cleanupAll();
 
       // Check that the tempDirs array is cleared
+
       expect((service as any).tempDirs).toHaveLength(0);
 
       // The directories should be removed (or at least the tracking should be cleared)

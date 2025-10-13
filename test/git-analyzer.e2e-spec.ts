@@ -2,15 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { GitAnalyzerController } from '../src/git-analyze/routes/git-analyzer.controller';
-import { GitAnalyzerService } from '../src/git-analyze/routes/git-analyzer.service';
-import { AnalyzerService } from '../src/git-analyze/services/analyzer.service';
 import { GitService } from '../src/git-analyze/services/git.service';
 import { TempService } from '../src/git-analyze/services/temp.service';
 
 describe('GitAnalyzer (e2e)', () => {
   let app: INestApplication;
-  let analyzerService: AnalyzerService;
   let gitService: GitService;
   let tempService: TempService;
 
@@ -20,7 +16,6 @@ describe('GitAnalyzer (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    analyzerService = moduleFixture.get<AnalyzerService>(AnalyzerService);
     gitService = moduleFixture.get<GitService>(GitService);
     tempService = moduleFixture.get<TempService>(TempService);
 

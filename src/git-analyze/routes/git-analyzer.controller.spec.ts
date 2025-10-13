@@ -99,7 +99,9 @@ describe('GitAnalyzerController', () => {
         await controller.analyzeRepository(request);
       } catch (error) {
         expect(error).toBeInstanceOf(HttpException);
+
         expect(error.getStatus()).toBe(HttpStatus.BAD_REQUEST);
+
         expect(error.getResponse()).toEqual({
           message: 'Analysis failed',
           error: errorMessage,
