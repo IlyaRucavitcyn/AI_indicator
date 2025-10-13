@@ -5,14 +5,14 @@ import {
   AnalyzeResponseDto,
   GitMetrics,
   ContributorStats,
-} from '../dto/analyze-response.dto';
+} from '../routes/dto/analyze-response.dto';
 
 @Injectable()
 export class AnalyzerService {
   constructor(
     private readonly gitService: GitService,
     private readonly tempService: TempService,
-  ) {}
+  ) { }
 
   /**
    * Analyzes a Git repository and returns metrics

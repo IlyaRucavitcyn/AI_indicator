@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AnalyzerService } from './analyzer.service';
 import { GitService } from './git.service';
 import { TempService } from './temp.service';
-import { AnalyzeResponseDto } from '../dto/analyze-response.dto';
+import { AnalyzeResponseDto } from '../routes/dto/analyze-response.dto';
 
 describe('AnalyzerService', () => {
   let service: AnalyzerService;
@@ -70,7 +70,7 @@ describe('AnalyzerService', () => {
       jest
         .spyOn(gitService, 'getRepositoryInfo')
         .mockResolvedValue(mockRepoInfo);
-      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => {});
+      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => { });
       jest.spyOn(tempService, 'extractRepoName').mockReturnValue('user/repo');
     });
 

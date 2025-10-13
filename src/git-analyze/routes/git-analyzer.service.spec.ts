@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GitAnalyzerService } from './git-analyzer.service';
-import { AnalyzerService } from './services/analyzer.service';
+import { AnalyzerService } from '../services/analyzer.service';
 import { AnalyzeRequestDto } from './dto/analyze-request.dto';
 import { AnalyzeResponseDto } from './dto/analyze-response.dto';
 

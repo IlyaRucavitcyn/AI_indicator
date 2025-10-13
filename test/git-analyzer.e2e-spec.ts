@@ -2,11 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { GitAnalyzerController } from '../src/git-analyzer/git-analyzer.controller';
-import { GitAnalyzerService } from '../src/git-analyzer/git-analyzer.service';
-import { AnalyzerService } from '../src/git-analyzer/services/analyzer.service';
-import { GitService } from '../src/git-analyzer/services/git.service';
-import { TempService } from '../src/git-analyzer/services/temp.service';
+import { GitAnalyzerController } from '../src/git-analyze/routes/git-analyzer.controller';
+import { GitAnalyzerService } from '../src/git-analyze/routes/git-analyzer.service';
+import { AnalyzerService } from '../src/git-analyze/services/analyzer.service';
+import { GitService } from '../src/git-analyze/services/git.service';
+import { TempService } from '../src/git-analyze/services/temp.service';
 
 describe('GitAnalyzer (e2e)', () => {
   let app: INestApplication;
@@ -73,7 +73,7 @@ describe('GitAnalyzer (e2e)', () => {
         branch: 'main',
         remote: 'https://github.com/octocat/Hello-World.git',
       });
-      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => {});
+      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => { });
       jest
         .spyOn(tempService, 'extractRepoName')
         .mockReturnValue('octocat/Hello-World');
@@ -177,7 +177,7 @@ describe('GitAnalyzer (e2e)', () => {
         branch: 'main',
         remote: 'https://github.com/octocat/Hello-World.git',
       });
-      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => {});
+      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => { });
       jest
         .spyOn(tempService, 'extractRepoName')
         .mockReturnValue('octocat/Hello-World');

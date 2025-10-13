@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import Table from 'cli-table3';
-import { AnalyzeResponseDto } from '../../git-analyzer/dto/analyze-response.dto';
+import { AnalyzeResponseDto } from '../../routes/dto/analyze-response.dto';
 
 export class ConsoleFormatter {
   /**
