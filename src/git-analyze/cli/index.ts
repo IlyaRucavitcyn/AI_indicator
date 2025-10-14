@@ -10,7 +10,24 @@ import { TempService } from '../services/temp.service';
 import { ConsoleFormatter } from './formatters/console.formatter';
 import { JsonFormatter } from './formatters/json.formatter';
 import { HtmlFormatter } from './formatters/html.formatter';
-// import { OutputFormat } from '../git-analyzer/dto/analyze-request.dto';
+import { AnalyzeResponseDto } from '../routes/dto/analyze-response.dto';
+import { OutputFormat } from '../routes/dto/analyze-request.dto';
+
+interface Formatter {
+  format: (data: AnalyzeResponseDto) => string;
+}
+
+interface FormatterConfig {
+  formatter: new () => Formatter;
+  extension: string;
+}
+
+const FORMATTERS: Record<OutputFormat, FormatterConfig> = {
+  [OutputFormat.CONSOLE]: { formatter: ConsoleFormatter, extension: 'txt' },
+  [OutputFormat.JSON]: { formatter: JsonFormatter, extension: 'json' },
+  [OutputFormat.HTML]: { formatter: HtmlFormatter, extension: 'html' },
+  [OutputFormat.ALL]: { formatter: ConsoleFormatter, extension: 'txt' }, // placeholder, not used
+};
 
 const program = new Command();
 
@@ -28,8 +45,8 @@ program
   .option('-b, --branch <branch>', 'Branch to analyze', 'main')
   .option(
     '-f, --format <format>',
-    'Output format (console, json, html, all)',
-    'console',
+    `Output format (${Object.values(OutputFormat).join(', ')})`,
+    OutputFormat.CONSOLE,
   )
   .option('-o, --output <path>', 'Output file path (for json/html formats)')
   .action(
@@ -69,39 +86,26 @@ program
     },
   );
 
-function handleOutput(result: any, format: string, outputPath?: string): void {
-  const formats = format === 'all' ? ['console', 'json', 'html'] : [format];
+function handleOutput(
+  result: AnalyzeResponseDto,
+  format: string,
+  outputPath?: string,
+): void {
+  const outputFormat = format as OutputFormat;
+  const formats =
+    outputFormat === OutputFormat.ALL
+      ? [OutputFormat.CONSOLE, OutputFormat.JSON, OutputFormat.HTML]
+      : [outputFormat];
 
   for (const fmt of formats) {
-    let content: string;
-    let extension: string;
-
-    let formatter: { format: (data: any) => string };
-    switch (fmt) {
-      case 'console': {
-        formatter = new ConsoleFormatter();
-        content = formatter.format(result);
-        extension = 'txt';
-        break;
-      }
-
-      case 'json': {
-        formatter = new JsonFormatter();
-        content = formatter.format(result);
-        extension = 'json';
-        break;
-      }
-
-      case 'html': {
-        formatter = new HtmlFormatter();
-        content = formatter.format(result);
-        extension = 'html';
-        break;
-      }
-
-      default:
-        throw new Error(`Unsupported format: ${fmt}`);
+    const formatterConfig = FORMATTERS[fmt];
+    if (!formatterConfig) {
+      throw new Error(`Unsupported format: ${fmt}`);
     }
+
+    const formatter = new formatterConfig.formatter();
+    const content = formatter.format(result);
+    const extension = formatterConfig.extension;
 
     if (outputPath && formats.length === 1) {
       // Single format with specific output path

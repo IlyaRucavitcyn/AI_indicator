@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GitAnalyzerService } from './git-analyzer.service';
 import { AnalyzerService } from '../services/analyzer.service';
-import { AnalyzeRequestDto } from './dto/analyze-request.dto';
+import { AnalyzeRequestDto, OutputFormat } from './dto/analyze-request.dto';
 import { AnalyzeResponseDto } from './dto/analyze-response.dto';
 
 describe('GitAnalyzerService', () => {
@@ -38,7 +38,7 @@ describe('GitAnalyzerService', () => {
       const request: AnalyzeRequestDto = {
         repositoryUrl: 'https://github.com/user/repo.git',
         branch: 'main',
-        format: 'json',
+        format: OutputFormat.JSON,
       };
 
       const expectedResponse: AnalyzeResponseDto = {
@@ -85,7 +85,7 @@ describe('GitAnalyzerService', () => {
       const request: AnalyzeRequestDto = {
         repositoryUrl: 'https://github.com/user/repo.git',
         branch: 'main',
-        format: 'json',
+        format: OutputFormat.JSON,
       };
 
       const expectedResponse: AnalyzeResponseDto = {
@@ -127,7 +127,7 @@ describe('GitAnalyzerService', () => {
       const request: AnalyzeRequestDto = {
         repositoryUrl: 'https://github.com/user/repo.git',
         branch: 'main',
-        format: 'json',
+        format: OutputFormat.JSON,
       };
 
       jest

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GitAnalyzerController } from './git-analyzer.controller';
 import { GitAnalyzerService } from './git-analyzer.service';
-import { AnalyzeRequestDto } from './dto/analyze-request.dto';
+import { AnalyzeRequestDto, OutputFormat } from './dto/analyze-request.dto';
 import { AnalyzeResponseDto } from './dto/analyze-response.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
@@ -39,7 +39,7 @@ describe('GitAnalyzerController', () => {
       const request: AnalyzeRequestDto = {
         repositoryUrl: 'https://github.com/user/repo.git',
         branch: 'main',
-        format: 'json',
+        format: OutputFormat.JSON,
       };
 
       const expectedResponse: AnalyzeResponseDto = {
@@ -83,7 +83,7 @@ describe('GitAnalyzerController', () => {
       const request: AnalyzeRequestDto = {
         repositoryUrl: 'https://github.com/user/repo.git',
         branch: 'main',
-        format: 'json',
+        format: OutputFormat.JSON,
       };
 
       const errorMessage = 'Repository not found';
@@ -114,7 +114,7 @@ describe('GitAnalyzerController', () => {
       const request: AnalyzeRequestDto = {
         repositoryUrl: 'invalid-url',
         branch: 'main',
-        format: 'json',
+        format: OutputFormat.JSON,
       };
 
       const errorMessage = 'Invalid repository URL';
