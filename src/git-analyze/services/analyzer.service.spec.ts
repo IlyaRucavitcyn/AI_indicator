@@ -69,7 +69,7 @@ describe('AnalyzerService', () => {
       jest
         .spyOn(gitService, 'getRepositoryInfo')
         .mockResolvedValue(mockRepoInfo);
-      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => { });
+      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => {});
       jest.spyOn(tempService, 'extractRepoName').mockReturnValue('user/repo');
     });
 

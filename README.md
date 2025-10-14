@@ -36,6 +36,19 @@ A powerful Git repository analysis tool that provides comprehensive metrics and 
 npm install
 ```
 
+### Environment Configuration
+
+Copy the example environment file and configure as needed:
+
+```bash
+cp .env.example .env
+```
+
+Available environment variables:
+
+- `PORT` - API server port (default: 3000)
+- `NODE_ENV` - Environment mode: development, production, or test (default: development)
+
 ### Build the Project
 
 ```bash
@@ -223,7 +236,18 @@ console.log(result.metrics);
 
 ### Environment Variables
 
+The application uses environment variables for configuration. Create a `.env` file in the root directory based on `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Available environment variables:
+
 - `PORT`: API server port (default: `3000`)
+- `NODE_ENV`: Environment mode - `development`, `production`, or `test` (default: `development`)
+
+**Note:** The `.env` file is ignored by git for security. Never commit sensitive configuration to version control.
 
 ### Output Formats
 

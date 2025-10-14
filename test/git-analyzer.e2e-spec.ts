@@ -68,7 +68,7 @@ describe('GitAnalyzer (e2e)', () => {
         branch: 'main',
         remote: 'https://github.com/octocat/Hello-World.git',
       });
-      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => { });
+      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => {});
       jest
         .spyOn(tempService, 'extractRepoName')
         .mockReturnValue('octocat/Hello-World');
@@ -172,7 +172,7 @@ describe('GitAnalyzer (e2e)', () => {
         branch: 'main',
         remote: 'https://github.com/octocat/Hello-World.git',
       });
-      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => { });
+      jest.spyOn(gitService, 'cleanupRepository').mockImplementation(() => {});
       jest
         .spyOn(tempService, 'extractRepoName')
         .mockReturnValue('octocat/Hello-World');
