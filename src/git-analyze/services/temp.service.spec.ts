@@ -86,39 +86,126 @@ describe('TempService', () => {
   });
 
   describe('extractRepoName', () => {
-    it('should extract repository name from GitHub URL', () => {
-      const url = 'https://github.com/user/repo.git';
-      const result = service.extractRepoName(url);
+    describe('GitHub URLs', () => {
+      it('should extract from HTTPS URL with .git', () => {
+        expect(service.extractRepoName('https://github.com/user/repo.git')).toBe(
+          'user/repo',
+        );
+      });
 
-      expect(result).toBe('user/repo');
+      it('should extract from HTTPS URL without .git', () => {
+        expect(service.extractRepoName('https://github.com/user/repo')).toBe(
+          'user/repo',
+        );
+      });
+
+      it('should extract from SSH protocol URL', () => {
+        expect(
+          service.extractRepoName('ssh://git@github.com/user/repo.git'),
+        ).toBe('user/repo');
+      });
     });
 
-    it('should extract repository name from GitHub URL without .git', () => {
-      const url = 'https://github.com/user/repo';
-      const result = service.extractRepoName(url);
+    describe('GitLab URLs', () => {
+      it('should extract from simple GitLab URL', () => {
+        expect(
+          service.extractRepoName('https://gitlab.com/user/project.git'),
+        ).toBe('user/project');
+      });
 
-      expect(result).toBe('user/repo');
+      it('should extract from nested GitLab groups', () => {
+        expect(
+          service.extractRepoName(
+            'https://gitlab.com/group/subgroup/project.git',
+          ),
+        ).toBe('group/subgroup/project');
+      });
+
+      it('should extract from deeply nested groups', () => {
+        expect(
+          service.extractRepoName(
+            'https://gitlab.com/org/team/subteam/project.git',
+          ),
+        ).toBe('org/team/subteam/project');
+      });
     });
 
-    it('should extract repository name from GitLab URL', () => {
-      const url = 'https://gitlab.com/user/repo.git';
-      const result = service.extractRepoName(url);
+    describe('Bitbucket URLs', () => {
+      it('should extract from Bitbucket URL with .git', () => {
+        expect(
+          service.extractRepoName('https://bitbucket.org/user/repo.git'),
+        ).toBe('user/repo');
+      });
 
-      expect(result).toBe('user/repo');
+      it('should extract from Bitbucket URL without .git', () => {
+        expect(service.extractRepoName('https://bitbucket.org/user/repo')).toBe(
+          'user/repo',
+        );
+      });
     });
 
-    it('should handle non-standard URLs with fallback', () => {
-      const url = 'git@github.com:user/repo.git';
-      const result = service.extractRepoName(url);
+    describe('Azure DevOps URLs', () => {
+      it('should extract and normalize Azure DevOps URL', () => {
+        expect(
+          service.extractRepoName(
+            'https://dev.azure.com/organization/project/_git/repository',
+          ),
+        ).toBe('organization/project/repository');
+      });
 
-      expect(result).toBe('git@github.com:user/repo');
+      it('should handle Azure DevOps URL with credentials', () => {
+        expect(
+          service.extractRepoName(
+            'https://organization@dev.azure.com/organization/project/_git/repository',
+          ),
+        ).toBe('organization/project/repository');
+      });
     });
 
-    it('should return unknown/repository for invalid URLs', () => {
-      const url = 'invalid-url';
-      const result = service.extractRepoName(url);
+    describe('Self-hosted Git servers', () => {
+      it('should extract from self-hosted GitLab', () => {
+        expect(
+          service.extractRepoName('https://gitlab.company.com/team/project.git'),
+        ).toBe('team/project');
+      });
 
-      expect(result).toBe('unknown/repository');
+      it('should extract from generic Git server', () => {
+        expect(
+          service.extractRepoName('https://git.company.com/user/repo.git'),
+        ).toBe('user/repo');
+      });
+
+      it('should extract from Gitea/Gogs', () => {
+        expect(service.extractRepoName('https://gitea.io/gitea/tea.git')).toBe(
+          'gitea/tea',
+        );
+      });
+    });
+
+    describe('Edge cases', () => {
+      it('should return unknown/repository for invalid URLs', () => {
+        expect(service.extractRepoName('invalid-url')).toBe(
+          'unknown/repository',
+        );
+      });
+
+      it('should return unknown/repository for empty string', () => {
+        expect(service.extractRepoName('')).toBe('unknown/repository');
+      });
+
+      it('should handle URLs with port numbers', () => {
+        expect(
+          service.extractRepoName('https://git.company.com:8080/user/repo.git'),
+        ).toBe('user/repo');
+      });
+
+      it('should handle URLs with query parameters', () => {
+        expect(
+          service.extractRepoName(
+            'https://github.com/user/repo.git?ref=main',
+          ),
+        ).toBe('user/repo');
+      });
     });
   });
 

@@ -53,17 +53,28 @@ export class TempService {
    * Gets the repository name from a Git URL
    * @param repositoryUrl Git repository URL
    * @returns Repository name (e.g., "user/repo" from "https://github.com/user/repo.git")
+   *
+   * Supports:
+   * - GitHub/GitLab/Bitbucket HTTPS URLs
+   * - GitLab nested groups (group/subgroup/project)
+   * - Azure DevOps (_git paths)
+   * - Self-hosted Git servers
+   * - URLs with or without .git suffix
    */
   extractRepoName(repositoryUrl: string): string {
     try {
       const url = new URL(repositoryUrl);
-      const pathname = url.pathname.replace(/\.git$/, '').replace(/^\//, '');
-      return pathname;
+      const pathname = url.pathname
+        .replace(/\.git$/, '')
+        .replace(/^\//, '')
+        .replace(/\/_git\//, '/');
+
+      return pathname || 'unknown/repository';
     } catch {
-      // Fallback for non-standard URLs
-      const match = repositoryUrl.match(/([^/]+)\/([^/]+?)(?:\.git)?$/);
+      // Fallback for non-standard URLs (shouldn't happen in practice)
+      const match = repositoryUrl.match(/([^/]+\/[^/]+?)(?:\.git)?$/);
       if (match) {
-        return `${match[1]}/${match[2]}`;
+        return match[1];
       }
       return 'unknown/repository';
     }
