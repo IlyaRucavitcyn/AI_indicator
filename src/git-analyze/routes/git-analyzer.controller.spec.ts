@@ -1,20 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GitAnalyzerController } from './git-analyzer.controller';
-import { GitAnalyzerService } from './git-analyzer.service';
+import { AnalyzerService } from '../services/analyzer.service';
 import { AnalyzeRequestDto, OutputFormat } from './dto/analyze-request.dto';
 import { AnalyzeResponseDto } from './dto/analyze-response.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 describe('GitAnalyzerController', () => {
   let controller: GitAnalyzerController;
-  let service: GitAnalyzerService;
+  let service: AnalyzerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [GitAnalyzerController],
       providers: [
         {
-          provide: GitAnalyzerService,
+          provide: AnalyzerService,
           useValue: {
             analyzeRepository: jest.fn(),
           },
@@ -23,7 +23,7 @@ describe('GitAnalyzerController', () => {
     }).compile();
 
     controller = module.get<GitAnalyzerController>(GitAnalyzerController);
-    service = module.get<GitAnalyzerService>(GitAnalyzerService);
+    service = module.get<AnalyzerService>(AnalyzerService);
   });
 
   afterEach(() => {
@@ -75,7 +75,10 @@ describe('GitAnalyzerController', () => {
 
       const result = await controller.analyzeRepository(request);
 
-      expect(service.analyzeRepository).toHaveBeenCalledWith(request);
+      expect(service.analyzeRepository).toHaveBeenCalledWith(
+        request.repositoryUrl,
+        request.branch,
+      );
       expect(result).toEqual(expectedResponse);
     });
 

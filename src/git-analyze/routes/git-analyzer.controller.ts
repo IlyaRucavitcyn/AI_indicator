@@ -5,13 +5,13 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import { GitAnalyzerService } from './git-analyzer.service';
+import { AnalyzerService } from '../services/analyzer.service';
 import { AnalyzeRequestDto } from './dto/analyze-request.dto';
 import { AnalyzeResponseDto } from './dto/analyze-response.dto';
 
 @Controller('git-analyzer')
 export class GitAnalyzerController {
-  constructor(private readonly gitAnalyzerService: GitAnalyzerService) {}
+  constructor(private readonly analyzerService: AnalyzerService) {}
 
   /**
    * Analyzes a Git repository
@@ -23,7 +23,10 @@ export class GitAnalyzerController {
     @Body() request: AnalyzeRequestDto,
   ): Promise<AnalyzeResponseDto> {
     try {
-      return await this.gitAnalyzerService.analyzeRepository(request);
+      return await this.analyzerService.analyzeRepository(
+        request.repositoryUrl,
+        request.branch,
+      );
     } catch (error) {
       throw new HttpException(
         {
