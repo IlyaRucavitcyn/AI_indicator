@@ -65,10 +65,39 @@ export class ConsoleFormatter {
       contributorsTable = `\n${chalk.bold.blue('Contributors Breakdown:')}\n${contributorsTableObj.toString()}`;
     }
 
+    // Create AI Indicators table
+    let aiIndicatorsTable = '';
+    if (metrics.aiIndicators) {
+      const aiTable = new Table({
+        head: [chalk.bold.blue('AI Indicator'), chalk.bold.blue('Value')],
+        style: {
+          head: ['cyan'],
+          border: ['gray'],
+        },
+      });
+
+      const ai = metrics.aiIndicators;
+      const firstCommitStatus = ai.firstCommitAnalysis.isSuspicious
+        ? chalk.red('⚠️  Suspicious')
+        : chalk.green('✓ Normal');
+
+      aiTable.push(
+        ['Avg Lines/Commit', chalk.bold(ai.avgLinesPerCommit.toString())],
+        ['Large Commits %', chalk.bold(`${ai.largeCommitPercentage}%`)],
+        [
+          'First Commit Size',
+          `${chalk.bold(ai.firstCommitAnalysis.lines.toString())} lines - ${firstCommitStatus}`,
+        ],
+        ['Avg Files/Commit', chalk.bold(ai.avgFilesPerCommit.toString())],
+      );
+
+      aiIndicatorsTable = `\n${chalk.bold.blue('🤖 AI Assistance Indicators:')}\n${aiTable.toString()}`;
+    }
+
     // Header
     const header = chalk.bold.blue('📊 Git Repository Analysis Report');
     const separator = '━'.repeat(50);
 
-    return `${header}\n${separator}\n${mainTable.toString()}${contributorsTable}\n${separator}\n${chalk.gray(`Analyzed at: ${data.analyzedAt}`)}`;
+    return `${header}\n${separator}\n${mainTable.toString()}${contributorsTable}${aiIndicatorsTable}\n${separator}\n${chalk.gray(`Analyzed at: ${data.analyzedAt}`)}`;
   }
 }

@@ -208,10 +208,15 @@ export class AnalyzerService {
       squaredDiffs.reduce((sum, val) => sum + val, 0) / commits.length;
     const stdDev = Math.sqrt(variance);
 
-    // Count commits that are more than 2 standard deviations above the mean
+    // Absolute threshold for "large commit" (typical human commits are <200 lines)
+    const LARGE_COMMIT_THRESHOLD = 500;
+
+    // Count commits that are either:
+    // 1. More than 2 standard deviations above the mean, OR
+    // 2. Above the absolute threshold of 500 lines
     const largeCommits = commits.filter((commit) => {
       const lines = commit.insertions + commit.deletions;
-      return lines > mean + 2 * stdDev;
+      return lines > mean + 2 * stdDev || lines > LARGE_COMMIT_THRESHOLD;
     });
 
     return Math.round((largeCommits.length / commits.length) * 10000) / 100;

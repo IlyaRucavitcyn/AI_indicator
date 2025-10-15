@@ -59,30 +59,46 @@ export class GitService {
    */
   async getCommitHistory(git: SimpleGit): Promise<CommitInfo[]> {
     try {
-      const log = await git.log([
-        '--stat=4096',
-        '--format=%H%n%an%n%ae%n%ad%n%s',
-      ]);
+      const log = await git.log();
 
       return Promise.all(
         log.all.map(async (commit) => {
-          // Get detailed diff stats for this commit
-          const diffSummary = await git.diffSummary([
-            `${commit.hash}^`,
-            commit.hash,
-          ]);
+          try {
+            // Get detailed diff stats for this commit
+            // Use --root flag for first commit that has no parent
+            const diffSummary = await git.diffSummary([
+              `${commit.hash}^`,
+              commit.hash,
+            ]).catch(async () => {
+              // If the above fails (first commit), use --root
+              return await git.diffSummary([commit.hash, '--root']);
+            });
 
-          return {
-            hash: commit.hash || '',
-            author: commit.author_name || '',
-            email: commit.author_email || '',
-            date: new Date(commit.date || ''),
-            message: commit.message || '',
-            filesChanged: diffSummary.files.length,
-            insertions: diffSummary.insertions,
-            deletions: diffSummary.deletions,
-            files: diffSummary.files.map((f) => f.file),
-          };
+            return {
+              hash: commit.hash || '',
+              author: commit.author_name || '',
+              email: commit.author_email || '',
+              date: new Date(commit.date || ''),
+              message: commit.message || '',
+              filesChanged: diffSummary.files.length,
+              insertions: diffSummary.insertions,
+              deletions: diffSummary.deletions,
+              files: diffSummary.files.map((f) => f.file),
+            };
+          } catch {
+            // If diff fails, return commit with zero stats
+            return {
+              hash: commit.hash || '',
+              author: commit.author_name || '',
+              email: commit.author_email || '',
+              date: new Date(commit.date || ''),
+              message: commit.message || '',
+              filesChanged: 0,
+              insertions: 0,
+              deletions: 0,
+              files: [],
+            };
+          }
         }),
       );
     } catch (error) {
