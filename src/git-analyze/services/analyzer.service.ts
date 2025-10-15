@@ -8,6 +8,10 @@ import {
 
 @Injectable()
 export class AnalyzerService {
+  // AI Indicator thresholds
+  private readonly LARGE_COMMIT_THRESHOLD = 500; // lines
+  private readonly BURST_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
+
   constructor(
     private readonly gitService: GitService,
     private readonly tempService: TempService,
@@ -208,15 +212,12 @@ export class AnalyzerService {
       squaredDiffs.reduce((sum, val) => sum + val, 0) / commits.length;
     const stdDev = Math.sqrt(variance);
 
-    // Absolute threshold for "large commit" (typical human commits are <200 lines)
-    const LARGE_COMMIT_THRESHOLD = 500;
-
     // Count commits that are either:
     // 1. More than 2 standard deviations above the mean, OR
-    // 2. Above the absolute threshold of 500 lines
+    // 2. Above the absolute threshold
     const largeCommits = commits.filter((commit) => {
       const lines = commit.insertions + commit.deletions;
-      return lines > mean + 2 * stdDev || lines > LARGE_COMMIT_THRESHOLD;
+      return lines > mean + 2 * stdDev || lines > this.LARGE_COMMIT_THRESHOLD;
     });
 
     return Math.round((largeCommits.length / commits.length) * 10000) / 100;
@@ -322,5 +323,32 @@ export class AnalyzerService {
     });
 
     return Math.round((suspiciousCommits.length / commits.length) * 10000) / 100;
+  }
+
+  /**
+   * Analyzes commit time distribution for bursty patterns
+   * @param commits Array of commit information
+   * @returns Percentage of commits that occur within burst window of previous commit
+   */
+  private analyzeBurstyCommits(commits: CommitInfo[]): number {
+    if (commits.length <= 1) {
+      return 0;
+    }
+
+    // Sort commits by date
+    const sortedCommits = [...commits].sort(
+      (a, b) => a.date.getTime() - b.date.getTime(),
+    );
+
+    // Count commits that occur within burst window of previous commit
+    const burstyCommits = sortedCommits
+      .slice(1)
+      .filter((commit, index) => {
+        const timeDiff = commit.date.getTime() - sortedCommits[index].date.getTime();
+        return timeDiff < this.BURST_WINDOW_MS;
+      })
+      .length;
+
+    return Math.round((burstyCommits / (commits.length - 1)) * 10000) / 100;
   }
 }
