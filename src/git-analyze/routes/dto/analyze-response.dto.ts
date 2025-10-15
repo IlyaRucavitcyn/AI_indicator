@@ -10,6 +10,16 @@ export interface ContributorStats {
   commitCount: number;
 }
 
+export interface AIIndicators {
+  avgLinesPerCommit: number;
+  largeCommitPercentage: number;
+  firstCommitAnalysis: {
+    lines: number;
+    isSuspicious: boolean;
+  };
+  avgFilesPerCommit: number;
+}
+
 export interface GitMetrics {
   totalCommits: number;
   contributors: number;
@@ -19,6 +29,7 @@ export interface GitMetrics {
   avgCommitsPerDay: number;
   topContributor: string;
   contributorStats: ContributorStats[];
+  aiIndicators?: AIIndicators;
 }
 
 export interface AnalyzeResponseDto {

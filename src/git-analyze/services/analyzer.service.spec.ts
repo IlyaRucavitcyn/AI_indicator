@@ -35,6 +35,9 @@ describe('AnalyzerService', () => {
         date: new Date('2024-01-01T00:00:00Z'),
         message: 'First commit',
         filesChanged: 5,
+        insertions: 50,
+        deletions: 10,
+        files: ['file1.ts', 'file2.ts', 'file3.ts', 'file4.ts', 'file5.ts'],
       },
       {
         hash: 'hash2',
@@ -43,6 +46,9 @@ describe('AnalyzerService', () => {
         date: new Date('2024-01-02T00:00:00Z'),
         message: 'Second commit',
         filesChanged: 3,
+        insertions: 30,
+        deletions: 5,
+        files: ['file1.ts', 'file2.ts', 'file3.ts'],
       },
       {
         hash: 'hash3',
@@ -51,6 +57,9 @@ describe('AnalyzerService', () => {
         date: new Date('2024-01-03T00:00:00Z'),
         message: 'Third commit',
         filesChanged: 2,
+        insertions: 20,
+        deletions: 2,
+        files: ['file1.ts', 'file2.ts'],
       },
     ];
 
@@ -102,6 +111,15 @@ describe('AnalyzerService', () => {
               commitCount: 1,
             },
           ],
+          aiIndicators: {
+            avgLinesPerCommit: 39,
+            largeCommitPercentage: 0,
+            firstCommitAnalysis: {
+              lines: 60,
+              isSuspicious: false,
+            },
+            avgFilesPerCommit: 3.33,
+          },
         },
         analyzedAt: expect.any(String),
       });

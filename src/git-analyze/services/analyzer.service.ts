@@ -140,6 +140,9 @@ export class AnalyzerService {
     const contributors = contributorStats.length;
     const topContributor = contributors > 0 ? contributorStats[0].email : '';
 
+    // Calculate AI indicators
+    const firstCommitAnalysis = this.analyzeFirstCommit(sortedCommits);
+
     return {
       totalCommits,
       contributors,
@@ -149,6 +152,15 @@ export class AnalyzerService {
       avgCommitsPerDay: Math.round(avgCommitsPerDay * 100) / 100,
       topContributor,
       contributorStats,
+      aiIndicators: {
+        avgLinesPerCommit: this.calculateAvgLinesPerCommit(commits),
+        largeCommitPercentage: this.calculateLargeCommitPercentage(commits),
+        firstCommitAnalysis: {
+          lines: firstCommitAnalysis.firstCommitLines,
+          isSuspicious: firstCommitAnalysis.isSuspiciouslyLarge,
+        },
+        avgFilesPerCommit: this.calculateAvgFilesPerCommit(commits),
+      },
     };
   }
 
