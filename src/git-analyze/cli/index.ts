@@ -7,6 +7,11 @@ import * as path from 'path';
 import { AnalyzerService } from '../services/analyzer.service';
 import { GitService } from '../services/git.service';
 import { TempService } from '../services/temp.service';
+import { BasicMetricsService } from '../services/metrics/basic-metrics.service';
+import { GitSizeService } from '../services/metrics/ai-indicators/git-size.service';
+import { GitMessagesService } from '../services/metrics/ai-indicators/git-messages.service';
+import { GitTimingService } from '../services/metrics/ai-indicators/git-timing.service';
+import { CodeQualityService } from '../services/metrics/ai-indicators/code-quality.service';
 import { ConsoleFormatter } from './formatters/console.formatter';
 import { JsonFormatter } from './formatters/json.formatter';
 import { HtmlFormatter } from './formatters/html.formatter';
@@ -64,7 +69,20 @@ program
         // Initialize services
         const tempService = new TempService();
         const gitService = new GitService(tempService);
-        const analyzerService = new AnalyzerService(gitService, tempService);
+        const basicMetricsService = new BasicMetricsService();
+        const gitSizeService = new GitSizeService();
+        const gitMessagesService = new GitMessagesService();
+        const gitTimingService = new GitTimingService();
+        const codeQualityService = new CodeQualityService();
+        const analyzerService = new AnalyzerService(
+          gitService,
+          tempService,
+          basicMetricsService,
+          gitSizeService,
+          gitMessagesService,
+          gitTimingService,
+          codeQualityService,
+        );
 
         // Perform analysis
         const result = await analyzerService.analyzeRepository(

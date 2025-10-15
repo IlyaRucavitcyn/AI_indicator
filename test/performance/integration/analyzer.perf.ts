@@ -16,8 +16,8 @@ import {
 
 async function runBenchmarks() {
   // Manually instantiate services (no NestJS DI in standalone script)
-  const gitService = new GitService();
   const tempService = new TempService();
+  const gitService = new GitService(tempService);
   const basicMetricsService = new BasicMetricsService();
   const gitSizeService = new GitSizeService();
   const gitMessagesService = new GitMessagesService();

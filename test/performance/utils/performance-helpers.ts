@@ -87,8 +87,8 @@ export class MockDataGenerator {
     return commits;
   }
 
-  private static generateContributors(count: number) {
-    const contributors = [];
+  private static generateContributors(count: number): Array<{ name: string; email: string }> {
+    const contributors: Array<{ name: string; email: string }> = [];
     for (let i = 0; i < count; i++) {
       contributors.push({
         name: `Developer ${i + 1}`,
