@@ -88,9 +88,9 @@ describe('TempService', () => {
   describe('extractRepoName', () => {
     describe('GitHub URLs', () => {
       it('should extract from HTTPS URL with .git', () => {
-        expect(service.extractRepoName('https://github.com/user/repo.git')).toBe(
-          'user/repo',
-        );
+        expect(
+          service.extractRepoName('https://github.com/user/repo.git'),
+        ).toBe('user/repo');
       });
 
       it('should extract from HTTPS URL without .git', () => {
@@ -165,7 +165,9 @@ describe('TempService', () => {
     describe('Self-hosted Git servers', () => {
       it('should extract from self-hosted GitLab', () => {
         expect(
-          service.extractRepoName('https://gitlab.company.com/team/project.git'),
+          service.extractRepoName(
+            'https://gitlab.company.com/team/project.git',
+          ),
         ).toBe('team/project');
       });
 
@@ -201,9 +203,7 @@ describe('TempService', () => {
 
       it('should handle URLs with query parameters', () => {
         expect(
-          service.extractRepoName(
-            'https://github.com/user/repo.git?ref=main',
-          ),
+          service.extractRepoName('https://github.com/user/repo.git?ref=main'),
         ).toBe('user/repo');
       });
     });
