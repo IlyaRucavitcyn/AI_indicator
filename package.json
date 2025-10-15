@@ -6,11 +6,11 @@
   "private": true,
   "license": "UNLICENSED",
   "bin": {
-    "git-analyzer": "./dist/cli/index.js"
+    "git-analyzer": "./dist/git-analyze/cli/index.js"
   },
   "scripts": {
     "build": "nest build",
-    "build:cli": "nest build && chmod +x dist/cli/index.js",
+    "build:cli": "nest build && chmod +x dist/git-analyze/cli/index.js",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "chalk": "^4.1.2",

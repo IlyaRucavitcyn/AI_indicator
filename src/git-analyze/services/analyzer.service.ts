@@ -4,7 +4,6 @@ import { TempService } from './temp.service';
 import {
   AnalyzeResponseDto,
   GitMetrics,
-  ContributorStats,
 } from '../routes/dto/analyze-response.dto';
 
 @Injectable()
@@ -108,34 +107,34 @@ export class AnalyzerService {
     // Calculate average commits per day
     const avgCommitsPerDay = durationDays > 0 ? totalCommits / durationDays : 0;
 
-    // Contributor analysis
-    const contributorMap = new Map<
-      string,
-      { name: string; email: string; count: number }
-    >();
-
-    commits.forEach((commit) => {
-      const key = commit.email;
-      if (contributorMap.has(key)) {
-        contributorMap.get(key)!.count++;
-      } else {
-        contributorMap.set(key, {
-          name: commit.author,
-          email: commit.email,
-          count: 1,
-        });
-      }
-    });
-
-    // Convert to array and sort by commit count
-    const contributorStats: ContributorStats[] = Array.from(
-      contributorMap.values(),
-    )
-      .map((contributor) => ({
-        email: contributor.email,
-        name: contributor.name,
-        commitCount: contributor.count,
-      }))
+    // Contributor analysis using reduce with immutable operations
+    const contributorStats = commits
+      .reduce(
+        (stats, commit) => {
+          const existingIndex = stats.findIndex(
+            (s) => s.email === commit.email,
+          );
+          if (existingIndex !== -1) {
+            return [
+              ...stats.slice(0, existingIndex),
+              {
+                ...stats[existingIndex],
+                commitCount: stats[existingIndex].commitCount + 1,
+              },
+              ...stats.slice(existingIndex + 1),
+            ];
+          }
+          return [
+            ...stats,
+            {
+              name: commit.author,
+              email: commit.email,
+              commitCount: 1,
+            },
+          ];
+        },
+        [] as Array<{ name: string; email: string; commitCount: number }>,
+      )
       .sort((a, b) => b.commitCount - a.commitCount);
 
     const contributors = contributorStats.length;

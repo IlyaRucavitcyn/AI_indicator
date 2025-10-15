@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { simpleGit, SimpleGit, LogResult } from 'simple-git';
+import { simpleGit, SimpleGit } from 'simple-git';
 
 export type { SimpleGit };
 import { TempService } from './temp.service';
@@ -56,7 +56,7 @@ export class GitService {
    */
   async getCommitHistory(git: SimpleGit): Promise<CommitInfo[]> {
     try {
-      const log: LogResult = await git.log();
+      const log = await git.log();
 
       return log.all.map((commit) => {
         // Use the standard fields from simple-git

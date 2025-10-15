@@ -182,7 +182,11 @@ export class HtmlFormatter {
   }
 
   private generateContributorsTable(metrics: {
-    contributorStats: any[];
+    contributorStats: Array<{
+      email: string;
+      name: string;
+      commitCount: number;
+    }>;
     totalCommits: number;
   }): string {
     if (metrics.contributorStats.length <= 1) {
@@ -190,16 +194,12 @@ export class HtmlFormatter {
     }
 
     const contributorsRows = metrics.contributorStats
-      .map(
-        (
-          contributor: { email: string; name: string; commitCount: number },
-          index: number,
-        ) => {
-          const percentage = (
-            (contributor.commitCount / metrics.totalCommits) *
-            100
-          ).toFixed(1);
-          return `
+      .map((contributor, index: number) => {
+        const percentage = (
+          (contributor.commitCount / metrics.totalCommits) *
+          100
+        ).toFixed(1);
+        return `
           <tr>
             <td class="rank">#${index + 1}</td>
             <td>${contributor.email}</td>
@@ -208,8 +208,7 @@ export class HtmlFormatter {
             <td class="percentage">${percentage}%</td>
           </tr>
         `;
-        },
-      )
+      })
       .join('');
 
     return `
