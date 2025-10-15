@@ -151,4 +151,98 @@ export class AnalyzerService {
       contributorStats,
     };
   }
+
+  /**
+   * Calculates average lines changed per commit
+   * @param commits Array of commit information
+   * @returns Average lines changed (insertions + deletions)
+   */
+  private calculateAvgLinesPerCommit(commits: CommitInfo[]): number {
+    if (commits.length === 0) {
+      return 0;
+    }
+
+    const totalLines = commits.reduce(
+      (sum, commit) => sum + commit.insertions + commit.deletions,
+      0,
+    );
+
+    return Math.round((totalLines / commits.length) * 100) / 100;
+  }
+
+  /**
+   * Calculates percentage of large commits (outliers)
+   * @param commits Array of commit information
+   * @returns Percentage of commits that are significantly larger than average
+   */
+  private calculateLargeCommitPercentage(commits: CommitInfo[]): number {
+    if (commits.length === 0) {
+      return 0;
+    }
+
+    // Calculate mean
+    const totalLines = commits.reduce(
+      (sum, commit) => sum + commit.insertions + commit.deletions,
+      0,
+    );
+    const mean = totalLines / commits.length;
+
+    // Calculate standard deviation
+    const squaredDiffs = commits.map((commit) => {
+      const lines = commit.insertions + commit.deletions;
+      return Math.pow(lines - mean, 2);
+    });
+    const variance =
+      squaredDiffs.reduce((sum, val) => sum + val, 0) / commits.length;
+    const stdDev = Math.sqrt(variance);
+
+    // Count commits that are more than 2 standard deviations above the mean
+    const largeCommits = commits.filter((commit) => {
+      const lines = commit.insertions + commit.deletions;
+      return lines > mean + 2 * stdDev;
+    });
+
+    return Math.round((largeCommits.length / commits.length) * 10000) / 100;
+  }
+
+  /**
+   * Analyzes the first commit to detect suspiciously large initial commits
+   * @param commits Array of commit information (sorted by date)
+   * @returns Object with first commit size and whether it's suspicious
+   */
+  private analyzeFirstCommit(commits: CommitInfo[]): {
+    firstCommitLines: number;
+    isSuspiciouslyLarge: boolean;
+  } {
+    if (commits.length === 0) {
+      return { firstCommitLines: 0, isSuspiciouslyLarge: false };
+    }
+
+    // Assume commits are already sorted by date
+    const firstCommit = commits[0];
+    const firstCommitLines = firstCommit.insertions + firstCommit.deletions;
+
+    // Calculate average of remaining commits (excluding first)
+    if (commits.length === 1) {
+      // If only one commit, it's suspicious if it's very large (>500 lines)
+      return {
+        firstCommitLines,
+        isSuspiciouslyLarge: firstCommitLines > 500,
+      };
+    }
+
+    const remainingCommits = commits.slice(1);
+    const avgRemainingLines =
+      remainingCommits.reduce(
+        (sum, commit) => sum + commit.insertions + commit.deletions,
+        0,
+      ) / remainingCommits.length;
+
+    // First commit is suspicious if it's 3x larger than the average of other commits
+    // OR if it's larger than 1000 lines
+    const isSuspiciouslyLarge =
+      firstCommitLines > avgRemainingLines * 3 || firstCommitLines > 1000;
+
+    return { firstCommitLines, isSuspiciouslyLarge };
+  }
 }
