@@ -2,20 +2,44 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AnalyzerService } from './analyzer.service';
 import { GitService } from './git.service';
 import { TempService } from './temp.service';
+import { BasicMetricsService } from './metrics/basic-metrics.service';
+import { GitSizeService } from './metrics/ai-indicators/git-size.service';
+import { GitMessagesService } from './metrics/ai-indicators/git-messages.service';
+import { GitTimingService } from './metrics/ai-indicators/git-timing.service';
+import { CodeQualityService } from './metrics/ai-indicators/code-quality.service';
 
 describe('AnalyzerService', () => {
   let service: AnalyzerService;
   let gitService: GitService;
   let tempService: TempService;
+  let basicMetricsService: BasicMetricsService;
+  let gitSizeService: GitSizeService;
+  let gitMessagesService: GitMessagesService;
+  let gitTimingService: GitTimingService;
+  let codeQualityService: CodeQualityService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AnalyzerService, GitService, TempService],
+      providers: [
+        AnalyzerService,
+        GitService,
+        TempService,
+        BasicMetricsService,
+        GitSizeService,
+        GitMessagesService,
+        GitTimingService,
+        CodeQualityService,
+      ],
     }).compile();
 
     service = module.get<AnalyzerService>(AnalyzerService);
     gitService = module.get<GitService>(GitService);
     tempService = module.get<TempService>(TempService);
+    basicMetricsService = module.get<BasicMetricsService>(BasicMetricsService);
+    gitSizeService = module.get<GitSizeService>(GitSizeService);
+    gitMessagesService = module.get<GitMessagesService>(GitMessagesService);
+    gitTimingService = module.get<GitTimingService>(GitTimingService);
+    codeQualityService = module.get<CodeQualityService>(CodeQualityService);
   });
 
   afterEach(() => {
@@ -35,6 +59,9 @@ describe('AnalyzerService', () => {
         date: new Date('2024-01-01T00:00:00Z'),
         message: 'First commit',
         filesChanged: 5,
+        insertions: 50,
+        deletions: 10,
+        files: ['file1.ts', 'file2.ts', 'file3.ts', 'file4.ts', 'file5.ts'],
       },
       {
         hash: 'hash2',
@@ -43,6 +70,9 @@ describe('AnalyzerService', () => {
         date: new Date('2024-01-02T00:00:00Z'),
         message: 'Second commit',
         filesChanged: 3,
+        insertions: 30,
+        deletions: 5,
+        files: ['file1.ts', 'file2.ts', 'file3.ts'],
       },
       {
         hash: 'hash3',
@@ -51,6 +81,9 @@ describe('AnalyzerService', () => {
         date: new Date('2024-01-03T00:00:00Z'),
         message: 'Third commit',
         filesChanged: 2,
+        insertions: 20,
+        deletions: 2,
+        files: ['file1.ts', 'file2.ts'],
       },
     ];
 
@@ -102,6 +135,18 @@ describe('AnalyzerService', () => {
               commitCount: 1,
             },
           ],
+          aiIndicators: {
+            avgLinesPerCommit: 39,
+            largeCommitPercentage: 0,
+            firstCommitAnalysis: {
+              lines: 60,
+              isSuspicious: false,
+            },
+            avgFilesPerCommit: 3.33,
+            commitMessagePatterns: 0,
+            burstyCommitPercentage: 0,
+            testFileRatio: 0,
+          },
         },
         analyzedAt: expect.any(String),
       });
@@ -153,6 +198,18 @@ describe('AnalyzerService', () => {
         avgCommitsPerDay: 0,
         topContributor: '',
         contributorStats: [],
+        aiIndicators: {
+          avgLinesPerCommit: 0,
+          largeCommitPercentage: 0,
+          firstCommitAnalysis: {
+            lines: 0,
+            isSuspicious: false,
+          },
+          avgFilesPerCommit: 0,
+          commitMessagePatterns: 0,
+          burstyCommitPercentage: 0,
+          testFileRatio: 0,
+        },
       });
     });
 
@@ -171,7 +228,7 @@ describe('AnalyzerService', () => {
   });
 
   describe('calculateMetrics', () => {
-    it('should calculate metrics correctly for multiple contributors', () => {
+    it('should orchestrate all metric services correctly', () => {
       const commits = [
         {
           hash: 'hash1',
@@ -180,101 +237,92 @@ describe('AnalyzerService', () => {
           date: new Date('2024-01-01T00:00:00Z'),
           message: 'First commit',
           filesChanged: 5,
-        },
-        {
-          hash: 'hash2',
-          author: 'Author 2',
-          email: 'author2@example.com',
-          date: new Date('2024-01-02T00:00:00Z'),
-          message: 'Second commit',
-          filesChanged: 3,
-        },
-        {
-          hash: 'hash3',
-          author: 'Author 1',
-          email: 'author1@example.com',
-          date: new Date('2024-01-03T00:00:00Z'),
-          message: 'Third commit',
-          filesChanged: 2,
+          insertions: 50,
+          deletions: 10,
+          files: ['file1.ts', 'file2.ts'],
         },
       ];
 
-      // Access private method for testing
-
-      const metrics = (service as any).calculateMetrics(commits);
-
-      expect(metrics.totalCommits).toBe(3);
-      expect(metrics.contributors).toBe(2);
-      expect(metrics.firstCommit).toBe('2024-01-01T00:00:00.000Z');
-      expect(metrics.lastCommit).toBe('2024-01-03T00:00:00.000Z');
-      expect(metrics.durationDays).toBe(2);
-      expect(metrics.avgCommitsPerDay).toBe(1.5);
-      expect(metrics.topContributor).toBe('author1@example.com');
-      expect(metrics.contributorStats).toHaveLength(2);
-      expect(metrics.contributorStats[0]).toEqual({
-        email: 'author1@example.com',
-        name: 'Author 1',
-        commitCount: 2,
+      // Mock all service responses
+      jest.spyOn(basicMetricsService, 'calculateBasicMetrics').mockReturnValue({
+        totalCommits: 1,
+        contributors: 1,
+        firstCommit: '2024-01-01T00:00:00.000Z',
+        lastCommit: '2024-01-01T00:00:00.000Z',
+        durationDays: 1,
+        avgCommitsPerDay: 1,
+        topContributor: 'author1@example.com',
+        contributorStats: [
+          {
+            name: 'Author 1',
+            email: 'author1@example.com',
+            commitCount: 1,
+          },
+        ],
       });
-      expect(metrics.contributorStats[1]).toEqual({
-        email: 'author2@example.com',
-        name: 'Author 2',
-        commitCount: 1,
+
+      jest.spyOn(gitSizeService, 'calculateSizeMetrics').mockReturnValue({
+        avgLinesPerCommit: 60,
+        largeCommitPercentage: 0,
+        firstCommitAnalysis: {
+          lines: 60,
+          isSuspicious: false,
+        },
+        avgFilesPerCommit: 5,
       });
-    });
 
-    it('should handle single contributor correctly', () => {
-      const commits = [
-        {
-          hash: 'hash1',
-          author: 'Author 1',
-          email: 'author1@example.com',
-          date: new Date('2024-01-01T00:00:00Z'),
-          message: 'First commit',
-          filesChanged: 5,
-        },
-        {
-          hash: 'hash2',
-          author: 'Author 1',
-          email: 'author1@example.com',
-          date: new Date('2024-01-02T00:00:00Z'),
-          message: 'Second commit',
-          filesChanged: 3,
-        },
-      ];
+      jest
+        .spyOn(gitMessagesService, 'analyzeCommitMessagePatterns')
+        .mockReturnValue(0);
+      jest.spyOn(gitTimingService, 'analyzeBurstyCommits').mockReturnValue(0);
+      jest.spyOn(codeQualityService, 'analyzeTestFileRatio').mockReturnValue(0);
 
       const metrics = (service as any).calculateMetrics(commits);
 
-      expect(metrics.totalCommits).toBe(2);
-      expect(metrics.contributors).toBe(1);
-      expect(metrics.topContributor).toBe('author1@example.com');
-      expect(metrics.contributorStats).toHaveLength(1);
-    });
+      // Verify all services were called
+      expect(basicMetricsService.calculateBasicMetrics).toHaveBeenCalledWith(
+        commits,
+      );
+      expect(gitSizeService.calculateSizeMetrics).toHaveBeenCalledWith(commits);
+      expect(
+        gitMessagesService.analyzeCommitMessagePatterns,
+      ).toHaveBeenCalledWith(commits);
+      expect(gitTimingService.analyzeBurstyCommits).toHaveBeenCalledWith(
+        commits,
+      );
+      expect(codeQualityService.analyzeTestFileRatio).toHaveBeenCalledWith(
+        commits,
+      );
 
-    it('should handle same-day commits correctly', () => {
-      const commits = [
-        {
-          hash: 'hash1',
-          author: 'Author 1',
-          email: 'author1@example.com',
-          date: new Date('2024-01-01T00:00:00Z'),
-          message: 'First commit',
-          filesChanged: 5,
+      // Verify the structure is correct
+      expect(metrics).toEqual({
+        totalCommits: 1,
+        contributors: 1,
+        firstCommit: '2024-01-01T00:00:00.000Z',
+        lastCommit: '2024-01-01T00:00:00.000Z',
+        durationDays: 1,
+        avgCommitsPerDay: 1,
+        topContributor: 'author1@example.com',
+        contributorStats: [
+          {
+            name: 'Author 1',
+            email: 'author1@example.com',
+            commitCount: 1,
+          },
+        ],
+        aiIndicators: {
+          avgLinesPerCommit: 60,
+          largeCommitPercentage: 0,
+          firstCommitAnalysis: {
+            lines: 60,
+            isSuspicious: false,
+          },
+          avgFilesPerCommit: 5,
+          commitMessagePatterns: 0,
+          burstyCommitPercentage: 0,
+          testFileRatio: 0,
         },
-        {
-          hash: 'hash2',
-          author: 'Author 1',
-          email: 'author1@example.com',
-          date: new Date('2024-01-01T12:00:00Z'),
-          message: 'Second commit',
-          filesChanged: 3,
-        },
-      ];
-
-      const metrics = (service as any).calculateMetrics(commits);
-
-      expect(metrics.durationDays).toBe(1);
-      expect(metrics.avgCommitsPerDay).toBe(2);
+      });
     });
   });
 });

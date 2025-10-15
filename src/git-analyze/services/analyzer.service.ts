@@ -5,12 +5,22 @@ import {
   AnalyzeResponseDto,
   GitMetrics,
 } from '../routes/dto/analyze-response.dto';
+import { BasicMetricsService } from './metrics/basic-metrics.service';
+import { GitSizeService } from './metrics/ai-indicators/git-size.service';
+import { GitMessagesService } from './metrics/ai-indicators/git-messages.service';
+import { GitTimingService } from './metrics/ai-indicators/git-timing.service';
+import { CodeQualityService } from './metrics/ai-indicators/code-quality.service';
 
 @Injectable()
 export class AnalyzerService {
   constructor(
     private readonly gitService: GitService,
     private readonly tempService: TempService,
+    private readonly basicMetricsService: BasicMetricsService,
+    private readonly gitSizeService: GitSizeService,
+    private readonly gitMessagesService: GitMessagesService,
+    private readonly gitTimingService: GitTimingService,
+    private readonly codeQualityService: CodeQualityService,
   ) {}
 
   /**
@@ -75,80 +85,28 @@ export class AnalyzerService {
    * @returns Calculated metrics
    */
   private calculateMetrics(commits: CommitInfo[]): GitMetrics {
-    if (commits.length === 0) {
-      return {
-        totalCommits: 0,
-        contributors: 0,
-        firstCommit: '',
-        lastCommit: '',
-        durationDays: 0,
-        avgCommitsPerDay: 0,
-        topContributor: '',
-        contributorStats: [],
-      };
-    }
+    // Get basic metrics from BasicMetricsService
+    const basicMetrics =
+      this.basicMetricsService.calculateBasicMetrics(commits);
 
-    // Sort commits by date
-    const sortedCommits = commits.sort(
-      (a, b) => a.date.getTime() - b.date.getTime(),
-    );
+    // Get size-related metrics from GitSizeService
+    const sizeMetrics = this.gitSizeService.calculateSizeMetrics(commits);
 
-    // Basic metrics
-    const totalCommits = commits.length;
-    const firstCommit = sortedCommits[0].date.toISOString();
-    const lastCommit =
-      sortedCommits[sortedCommits.length - 1].date.toISOString();
-
-    // Calculate duration
-    const durationMs =
-      new Date(lastCommit).getTime() - new Date(firstCommit).getTime();
-    const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
-
-    // Calculate average commits per day
-    const avgCommitsPerDay = durationDays > 0 ? totalCommits / durationDays : 0;
-
-    // Contributor analysis using reduce with immutable operations
-    const contributorStats = commits
-      .reduce(
-        (stats, commit) => {
-          const existingIndex = stats.findIndex(
-            (s) => s.email === commit.email,
-          );
-          if (existingIndex !== -1) {
-            return [
-              ...stats.slice(0, existingIndex),
-              {
-                ...stats[existingIndex],
-                commitCount: stats[existingIndex].commitCount + 1,
-              },
-              ...stats.slice(existingIndex + 1),
-            ];
-          }
-          return [
-            ...stats,
-            {
-              name: commit.author,
-              email: commit.email,
-              commitCount: 1,
-            },
-          ];
-        },
-        [] as Array<{ name: string; email: string; commitCount: number }>,
-      )
-      .sort((a, b) => b.commitCount - a.commitCount);
-
-    const contributors = contributorStats.length;
-    const topContributor = contributors > 0 ? contributorStats[0].email : '';
+    // Get AI indicator metrics from specialized services
+    const commitMessagePatterns =
+      this.gitMessagesService.analyzeCommitMessagePatterns(commits);
+    const burstyCommitPercentage =
+      this.gitTimingService.analyzeBurstyCommits(commits);
+    const testFileRatio = this.codeQualityService.analyzeTestFileRatio(commits);
 
     return {
-      totalCommits,
-      contributors,
-      firstCommit,
-      lastCommit,
-      durationDays,
-      avgCommitsPerDay: Math.round(avgCommitsPerDay * 100) / 100,
-      topContributor,
-      contributorStats,
+      ...basicMetrics,
+      aiIndicators: {
+        ...sizeMetrics,
+        commitMessagePatterns,
+        burstyCommitPercentage,
+        testFileRatio,
+      },
     };
   }
 }

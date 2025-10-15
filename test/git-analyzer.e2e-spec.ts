@@ -62,6 +62,9 @@ describe('GitAnalyzer (e2e)', () => {
           date: new Date('2024-01-01T00:00:00Z'),
           message: 'Test commit',
           filesChanged: 1,
+          insertions: 10,
+          deletions: 2,
+          files: ['test.ts'],
         },
       ]);
       jest.spyOn(gitService, 'getRepositoryInfo').mockResolvedValue({
