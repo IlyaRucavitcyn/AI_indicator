@@ -18,6 +18,9 @@ export interface AIIndicators {
     isSuspicious: boolean;
   };
   avgFilesPerCommit: number;
+  commitMessagePatterns: number;
+  burstyCommitPercentage: number;
+  testFileRatio: number;
 }
 
 export interface GitMetrics {

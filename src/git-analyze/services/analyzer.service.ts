@@ -164,6 +164,9 @@ export class AnalyzerService {
           isSuspicious: firstCommitAnalysis.isSuspiciouslyLarge,
         },
         avgFilesPerCommit: this.calculateAvgFilesPerCommit(commits),
+        commitMessagePatterns: this.analyzeCommitMessagePatterns(commits),
+        burstyCommitPercentage: this.analyzeBurstyCommits(commits),
+        testFileRatio: this.analyzeTestFileRatio(commits),
       },
     };
   }
