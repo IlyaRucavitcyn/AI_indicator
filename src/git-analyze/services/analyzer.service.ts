@@ -86,7 +86,8 @@ export class AnalyzerService {
    */
   private calculateMetrics(commits: CommitInfo[]): GitMetrics {
     // Get basic metrics from BasicMetricsService
-    const basicMetrics = this.basicMetricsService.calculateBasicMetrics(commits);
+    const basicMetrics =
+      this.basicMetricsService.calculateBasicMetrics(commits);
 
     // Get size-related metrics from GitSizeService
     const sizeMetrics = this.gitSizeService.calculateSizeMetrics(commits);

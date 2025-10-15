@@ -51,7 +51,8 @@ describe('GitMessagesService', () => {
           author: 'Author 1',
           email: 'author1@example.com',
           date: new Date('2024-01-03'),
-          message: 'this is a normal human commit message explaining the context',
+          message:
+            'this is a normal human commit message explaining the context',
           filesChanged: 3,
           insertions: 20,
           deletions: 2,

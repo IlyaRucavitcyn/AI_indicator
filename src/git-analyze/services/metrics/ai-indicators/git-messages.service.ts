@@ -43,6 +43,8 @@ export class GitMessagesService {
       return matchesPattern || isGeneric;
     });
 
-    return Math.round((suspiciousCommits.length / commits.length) * 10000) / 100;
+    return (
+      Math.round((suspiciousCommits.length / commits.length) * 10000) / 100
+    );
   }
 }

@@ -66,13 +66,12 @@ export class GitService {
           try {
             // Get detailed diff stats for this commit
             // Use --root flag for first commit that has no parent
-            const diffSummary = await git.diffSummary([
-              `${commit.hash}^`,
-              commit.hash,
-            ]).catch(async () => {
-              // If the above fails (first commit), use --root
-              return await git.diffSummary([commit.hash, '--root']);
-            });
+            const diffSummary = await git
+              .diffSummary([`${commit.hash}^`, commit.hash])
+              .catch(async () => {
+                // If the above fails (first commit), use --root
+                return await git.diffSummary([commit.hash, '--root']);
+              });
 
             return {
               hash: commit.hash || '',

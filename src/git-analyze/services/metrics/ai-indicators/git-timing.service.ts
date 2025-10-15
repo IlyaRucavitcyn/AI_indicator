@@ -21,13 +21,11 @@ export class GitTimingService {
     );
 
     // Count commits that occur within burst window of previous commit
-    const burstyCommits = sortedCommits
-      .slice(1)
-      .filter((commit, index) => {
-        const timeDiff = commit.date.getTime() - sortedCommits[index].date.getTime();
-        return timeDiff < this.BURST_WINDOW_MS;
-      })
-      .length;
+    const burstyCommits = sortedCommits.slice(1).filter((commit, index) => {
+      const timeDiff =
+        commit.date.getTime() - sortedCommits[index].date.getTime();
+      return timeDiff < this.BURST_WINDOW_MS;
+    }).length;
 
     return Math.round((burstyCommits / (commits.length - 1)) * 10000) / 100;
   }
