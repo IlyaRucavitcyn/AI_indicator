@@ -128,9 +128,7 @@ export class AnalyzerService {
     });
 
     // Convert to array and sort by commit count
-    const contributorStats: ContributorStats[] = Array.from(
-      contributorMap.values(),
-    )
+    const contributorStats = Array.from(contributorMap.values())
       .map((contributor) => ({
         email: contributor.email,
         name: contributor.name,
