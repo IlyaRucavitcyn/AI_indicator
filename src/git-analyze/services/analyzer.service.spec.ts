@@ -472,6 +472,50 @@ describe('AnalyzerService', () => {
 
         expect(result).toBe(0);
       });
+
+      it('should detect commits above absolute threshold (500 lines)', () => {
+        // All commits are uniformly large (no statistical outliers), but exceed 500 lines
+        const commits = [
+          {
+            hash: 'hash1',
+            author: 'Author 1',
+            email: 'author1@example.com',
+            date: new Date('2024-01-01'),
+            message: 'Large commit 1',
+            filesChanged: 10,
+            insertions: 600,
+            deletions: 50,
+            files: Array(10).fill('file.ts'),
+          },
+          {
+            hash: 'hash2',
+            author: 'Author 1',
+            email: 'author1@example.com',
+            date: new Date('2024-01-02'),
+            message: 'Large commit 2',
+            filesChanged: 10,
+            insertions: 620,
+            deletions: 40,
+            files: Array(10).fill('file.ts'),
+          },
+          {
+            hash: 'hash3',
+            author: 'Author 1',
+            email: 'author1@example.com',
+            date: new Date('2024-01-03'),
+            message: 'Large commit 3',
+            filesChanged: 10,
+            insertions: 610,
+            deletions: 45,
+            files: Array(10).fill('file.ts'),
+          },
+        ];
+
+        const result = (service as any).calculateLargeCommitPercentage(commits);
+
+        // All 3 commits exceed 500 lines, so 100% should be flagged
+        expect(result).toBe(100);
+      });
     });
 
     describe('analyzeFirstCommit', () => {
