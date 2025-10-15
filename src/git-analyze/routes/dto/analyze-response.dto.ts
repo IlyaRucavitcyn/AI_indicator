@@ -1,3 +1,9 @@
+export interface MetricResult<T = any> {
+  value: number;
+  details?: T;
+  description: string;
+}
+
 export interface ContributorStats {
   email: string;
   name: string;

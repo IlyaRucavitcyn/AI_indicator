@@ -11,6 +11,9 @@ export interface CommitInfo {
   date: Date;
   message: string;
   filesChanged: number;
+  insertions: number;
+  deletions: number;
+  files: string[];
 }
 
 @Injectable()
@@ -56,19 +59,32 @@ export class GitService {
    */
   async getCommitHistory(git: SimpleGit): Promise<CommitInfo[]> {
     try {
-      const log = await git.log();
+      const log = await git.log([
+        '--stat=4096',
+        '--format=%H%n%an%n%ae%n%ad%n%s',
+      ]);
 
-      return log.all.map((commit) => {
-        // Use the standard fields from simple-git
-        return {
-          hash: commit.hash || '',
-          author: commit.author_name || '',
-          email: commit.author_email || '',
-          date: new Date(commit.date || ''),
-          message: commit.message || '',
-          filesChanged: 0, // We'll calculate this separately if needed
-        };
-      });
+      return Promise.all(
+        log.all.map(async (commit) => {
+          // Get detailed diff stats for this commit
+          const diffSummary = await git.diffSummary([
+            `${commit.hash}^`,
+            commit.hash,
+          ]);
+
+          return {
+            hash: commit.hash || '',
+            author: commit.author_name || '',
+            email: commit.author_email || '',
+            date: new Date(commit.date || ''),
+            message: commit.message || '',
+            filesChanged: diffSummary.files.length,
+            insertions: diffSummary.insertions,
+            deletions: diffSummary.deletions,
+            files: diffSummary.files.map((f) => f.file),
+          };
+        }),
+      );
     } catch (error) {
       throw new Error(
         `Failed to read commit history: ${(error as Error).message}`,

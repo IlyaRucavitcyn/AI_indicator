@@ -89,6 +89,14 @@ describe('GitService', () => {
             },
           ],
         }),
+        diffSummary: jest.fn().mockResolvedValue({
+          files: [
+            { file: 'file1.ts', insertions: 10, deletions: 5 },
+            { file: 'file2.ts', insertions: 3, deletions: 1 },
+          ],
+          insertions: 13,
+          deletions: 6,
+        }),
       };
 
       const result = await service.getCommitHistory(mockGit as any);
@@ -100,7 +108,10 @@ describe('GitService', () => {
         email: 'email1',
         date: new Date('2024-01-01T00:00:00Z'),
         message: 'commit message 1',
-        filesChanged: 0,
+        filesChanged: 2,
+        insertions: 13,
+        deletions: 6,
+        files: ['file1.ts', 'file2.ts'],
       });
       expect(result[1]).toEqual({
         hash: 'hash2',
@@ -108,7 +119,10 @@ describe('GitService', () => {
         email: 'email2',
         date: new Date('2024-01-02T00:00:00Z'),
         message: 'commit message 2',
-        filesChanged: 0,
+        filesChanged: 2,
+        insertions: 13,
+        deletions: 6,
+        files: ['file1.ts', 'file2.ts'],
       });
     });
 
