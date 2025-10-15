@@ -89,6 +89,9 @@ export class ConsoleFormatter {
           `${chalk.bold(ai.firstCommitAnalysis.lines.toString())} lines - ${firstCommitStatus}`,
         ],
         ['Avg Files/Commit', chalk.bold(ai.avgFilesPerCommit.toString())],
+        ['Commit Msg Patterns %', chalk.bold(`${ai.commitMessagePatterns}%`)],
+        ['Bursty Commits %', chalk.bold(`${ai.burstyCommitPercentage}%`)],
+        ['Test File Ratio %', chalk.bold(`${ai.testFileRatio}%`)],
       );
 
       aiIndicatorsTable = `\n${chalk.bold.blue('🤖 AI Assistance Indicators:')}\n${aiTable.toString()}`;
