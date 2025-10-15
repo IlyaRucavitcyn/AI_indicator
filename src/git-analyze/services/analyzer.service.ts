@@ -245,4 +245,22 @@ export class AnalyzerService {
 
     return { firstCommitLines, isSuspiciouslyLarge };
   }
+
+  /**
+   * Calculates average number of files changed per commit
+   * @param commits Array of commit information
+   * @returns Average files per commit
+   */
+  private calculateAvgFilesPerCommit(commits: CommitInfo[]): number {
+    if (commits.length === 0) {
+      return 0;
+    }
+
+    const totalFiles = commits.reduce(
+      (sum, commit) => sum + commit.filesChanged,
+      0,
+    );
+
+    return Math.round((totalFiles / commits.length) * 100) / 100;
+  }
 }

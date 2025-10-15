@@ -582,5 +582,118 @@ describe('AnalyzerService', () => {
         expect(result.isSuspiciouslyLarge).toBe(false);
       });
     });
+
+    describe('calculateAvgFilesPerCommit', () => {
+      it('should calculate average files per commit correctly', () => {
+        const commits = [
+          {
+            hash: 'hash1',
+            author: 'Author 1',
+            email: 'author1@example.com',
+            date: new Date('2024-01-01'),
+            message: 'Commit 1',
+            filesChanged: 5,
+            insertions: 50,
+            deletions: 10,
+            files: ['file1.ts', 'file2.ts', 'file3.ts', 'file4.ts', 'file5.ts'],
+          },
+          {
+            hash: 'hash2',
+            author: 'Author 1',
+            email: 'author1@example.com',
+            date: new Date('2024-01-02'),
+            message: 'Commit 2',
+            filesChanged: 3,
+            insertions: 30,
+            deletions: 5,
+            files: ['file1.ts', 'file2.ts', 'file3.ts'],
+          },
+          {
+            hash: 'hash3',
+            author: 'Author 1',
+            email: 'author1@example.com',
+            date: new Date('2024-01-03'),
+            message: 'Commit 3',
+            filesChanged: 2,
+            insertions: 20,
+            deletions: 2,
+            files: ['file1.ts', 'file2.ts'],
+          },
+        ];
+
+        const result = (service as any).calculateAvgFilesPerCommit(commits);
+
+        // (5 + 3 + 2) / 3 = 10 / 3 = 3.33
+        expect(result).toBe(3.33);
+      });
+
+      it('should return 0 for empty commits', () => {
+        const result = (service as any).calculateAvgFilesPerCommit([]);
+        expect(result).toBe(0);
+      });
+
+      it('should handle single file commits', () => {
+        const commits = [
+          {
+            hash: 'hash1',
+            author: 'Author 1',
+            email: 'author1@example.com',
+            date: new Date('2024-01-01'),
+            message: 'Commit 1',
+            filesChanged: 1,
+            insertions: 10,
+            deletions: 0,
+            files: ['file1.ts'],
+          },
+          {
+            hash: 'hash2',
+            author: 'Author 1',
+            email: 'author1@example.com',
+            date: new Date('2024-01-02'),
+            message: 'Commit 2',
+            filesChanged: 1,
+            insertions: 15,
+            deletions: 0,
+            files: ['file2.ts'],
+          },
+        ];
+
+        const result = (service as any).calculateAvgFilesPerCommit(commits);
+
+        expect(result).toBe(1);
+      });
+
+      it('should detect commits with many files (AI indicator)', () => {
+        const commits = [
+          {
+            hash: 'hash1',
+            author: 'Author 1',
+            email: 'author1@example.com',
+            date: new Date('2024-01-01'),
+            message: 'Initial AI-generated commit',
+            filesChanged: 50,
+            insertions: 1000,
+            deletions: 0,
+            files: Array(50).fill('file.ts'),
+          },
+          {
+            hash: 'hash2',
+            author: 'Author 1',
+            email: 'author1@example.com',
+            date: new Date('2024-01-02'),
+            message: 'Small fix',
+            filesChanged: 1,
+            insertions: 5,
+            deletions: 2,
+            files: ['file1.ts'],
+          },
+        ];
+
+        const result = (service as any).calculateAvgFilesPerCommit(commits);
+
+        // (50 + 1) / 2 = 25.5
+        expect(result).toBe(25.5);
+      });
+    });
   });
 });
