@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { simpleGit, SimpleGit, LogResult } from 'simple-git';
+import { simpleGit, SimpleGit } from 'simple-git';
 
 export type { SimpleGit };
 import { TempService } from './temp.service';

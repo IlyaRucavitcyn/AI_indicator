@@ -4,7 +4,6 @@ import { TempService } from './temp.service';
 import {
   AnalyzeResponseDto,
   GitMetrics,
-  ContributorStats,
 } from '../routes/dto/analyze-response.dto';
 
 @Injectable()
