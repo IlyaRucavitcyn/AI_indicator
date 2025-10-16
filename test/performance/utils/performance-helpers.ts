@@ -32,7 +32,9 @@ export class MockDataGenerator {
 
     const commits: CommitInfo[] = [];
     const startDate = new Date('2024-01-01T00:00:00Z');
-    const contributors = this.generateContributors(Math.min(10, Math.ceil(count / 10)));
+    const contributors = this.generateContributors(
+      Math.min(10, Math.ceil(count / 10)),
+    );
 
     for (let i = 0; i < count; i++) {
       const contributor = contributors[i % contributors.length];
@@ -41,7 +43,8 @@ export class MockDataGenerator {
       const filesChanged = Math.max(
         1,
         Math.round(
-          avgFilesPerCommit + (Math.random() - 0.5) * 2 * variability * avgFilesPerCommit,
+          avgFilesPerCommit +
+            (Math.random() - 0.5) * 2 * variability * avgFilesPerCommit,
         ),
       );
 
@@ -49,17 +52,23 @@ export class MockDataGenerator {
       const totalLines = Math.max(
         1,
         Math.round(
-          avgLinesPerCommit + (Math.random() - 0.5) * 2 * variability * avgLinesPerCommit,
+          avgLinesPerCommit +
+            (Math.random() - 0.5) * 2 * variability * avgLinesPerCommit,
         ),
       );
       const insertions = Math.round(totalLines * (0.5 + Math.random() * 0.5));
       const deletions = totalLines - insertions;
 
       // Generate files (with test files based on ratio)
-      const files = this.generateFiles(filesChanged, Math.random() < testFileRatio);
+      const files = this.generateFiles(
+        filesChanged,
+        Math.random() < testFileRatio,
+      );
 
       // Generate commit message
-      const message = this.generateCommitMessage(Math.random() < conventionalCommitRatio);
+      const message = this.generateCommitMessage(
+        Math.random() < conventionalCommitRatio,
+      );
 
       // Generate date (with bursts based on ratio)
       const isBursty = i > 0 && Math.random() < burstRatio;
@@ -67,9 +76,7 @@ export class MockDataGenerator {
         ? Math.random() * 20 * 60 * 1000 // 0-20 minutes for bursty
         : Math.random() * 24 * 60 * 60 * 1000; // 0-24 hours for normal
 
-      const date = new Date(
-        startDate.getTime() + i * 3600000 + timeDelta,
-      );
+      const date = new Date(startDate.getTime() + i * 3600000 + timeDelta);
 
       commits.push({
         hash: this.generateHash(i),
@@ -87,7 +94,9 @@ export class MockDataGenerator {
     return commits;
   }
 
-  private static generateContributors(count: number): Array<{ name: string; email: string }> {
+  private static generateContributors(
+    count: number,
+  ): Array<{ name: string; email: string }> {
     const contributors: Array<{ name: string; email: string }> = [];
     for (let i = 0; i < count; i++) {
       contributors.push({

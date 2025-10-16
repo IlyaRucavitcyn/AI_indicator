@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CommitInfo } from '../../git.service';
+import { METRIC_THRESHOLDS } from '../metric-thresholds.constants';
 
 @Injectable()
 export class GitTimingService {
-  private readonly BURST_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
+  private readonly BURST_WINDOW_MS =
+    METRIC_THRESHOLDS.BURST_WINDOW_MINUTES * 60 * 1000;
 
   /**
    * Analyzes commit time distribution for bursty patterns

@@ -1,4 +1,7 @@
-import { AnalyzeResponseDto } from '../../routes/dto/analyze-response.dto';
+import {
+  AnalyzeResponseDto,
+  GitMetrics,
+} from '../../routes/dto/analyze-response.dto';
 
 export class HtmlFormatter {
   /**
@@ -120,6 +123,54 @@ export class HtmlFormatter {
             font-size: 0.8em;
             margin: 5px;
         }
+        .ai-indicators {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .ai-indicators h3 {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            font-size: 1.2em;
+        }
+        .ai-metric {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .ai-metric:last-child {
+            border-bottom: none;
+        }
+        .ai-metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .ai-metric-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        .ai-metric-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .ai-metric-description {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        .suspicious {
+            color: #e74c3c;
+        }
+        .normal {
+            color: #27ae60;
+        }
     </style>
 </head>
 <body>
@@ -169,6 +220,8 @@ export class HtmlFormatter {
     </div>
 
     ${this.generateContributorsTable(metrics)}
+
+    ${this.generateAIIndicators(metrics)}
 
     <div class="footer">
         <p>Report generated on ${new Date(analyzedAt).toLocaleString()}</p>
@@ -228,6 +281,82 @@ export class HtmlFormatter {
                 ${contributorsRows}
             </tbody>
         </table>
+    </div>`;
+  }
+
+  private generateAIIndicators(metrics: GitMetrics): string {
+    if (!metrics.aiIndicators) {
+      return '';
+    }
+
+    const ai = metrics.aiIndicators;
+    const firstCommitValue = ai.firstCommitAnalysis.value as {
+      lines: number;
+      isSuspicious: boolean;
+    };
+    const firstCommitStatus = firstCommitValue.isSuspicious
+      ? '<span class="suspicious">⚠️ Suspicious</span>'
+      : '<span class="normal">✓ Normal</span>';
+
+    return `
+    <div class="ai-indicators">
+        <h3>🤖 AI Assistance Indicators</h3>
+
+        <div class="ai-metric">
+            <div class="ai-metric-header">
+                <span class="ai-metric-name">Avg Lines/Commit</span>
+                <span class="ai-metric-value">${ai.avgLinesPerCommit.value}</span>
+            </div>
+            <div class="ai-metric-description">${ai.avgLinesPerCommit.description}</div>
+        </div>
+
+        <div class="ai-metric">
+            <div class="ai-metric-header">
+                <span class="ai-metric-name">Large Commits %</span>
+                <span class="ai-metric-value">${ai.largeCommitPercentage.value}%</span>
+            </div>
+            <div class="ai-metric-description">${ai.largeCommitPercentage.description}</div>
+        </div>
+
+        <div class="ai-metric">
+            <div class="ai-metric-header">
+                <span class="ai-metric-name">First Commit Size</span>
+                <span class="ai-metric-value">${firstCommitValue.lines} lines ${firstCommitStatus}</span>
+            </div>
+            <div class="ai-metric-description">${ai.firstCommitAnalysis.description}</div>
+        </div>
+
+        <div class="ai-metric">
+            <div class="ai-metric-header">
+                <span class="ai-metric-name">Avg Files/Commit</span>
+                <span class="ai-metric-value">${ai.avgFilesPerCommit.value}</span>
+            </div>
+            <div class="ai-metric-description">${ai.avgFilesPerCommit.description}</div>
+        </div>
+
+        <div class="ai-metric">
+            <div class="ai-metric-header">
+                <span class="ai-metric-name">Commit Msg Patterns %</span>
+                <span class="ai-metric-value">${ai.commitMessagePatterns.value}%</span>
+            </div>
+            <div class="ai-metric-description">${ai.commitMessagePatterns.description}</div>
+        </div>
+
+        <div class="ai-metric">
+            <div class="ai-metric-header">
+                <span class="ai-metric-name">Bursty Commits %</span>
+                <span class="ai-metric-value">${ai.burstyCommitPercentage.value}%</span>
+            </div>
+            <div class="ai-metric-description">${ai.burstyCommitPercentage.description}</div>
+        </div>
+
+        <div class="ai-metric">
+            <div class="ai-metric-header">
+                <span class="ai-metric-name">Test File Ratio %</span>
+                <span class="ai-metric-value">${ai.testFileRatio.value}%</span>
+            </div>
+            <div class="ai-metric-description">${ai.testFileRatio.description}</div>
+        </div>
     </div>`;
   }
 }

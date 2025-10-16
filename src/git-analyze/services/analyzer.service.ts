@@ -10,6 +10,7 @@ import { GitSizeService } from './metrics/ai-indicators/git-size.service';
 import { GitMessagesService } from './metrics/ai-indicators/git-messages.service';
 import { GitTimingService } from './metrics/ai-indicators/git-timing.service';
 import { CodeQualityService } from './metrics/ai-indicators/code-quality.service';
+import { METRIC_DESCRIPTIONS } from './metrics/metric-thresholds.constants';
 
 @Injectable()
 export class AnalyzerService {
@@ -102,10 +103,34 @@ export class AnalyzerService {
     return {
       ...basicMetrics,
       aiIndicators: {
-        ...sizeMetrics,
-        commitMessagePatterns,
-        burstyCommitPercentage,
-        testFileRatio,
+        avgLinesPerCommit: {
+          value: sizeMetrics.avgLinesPerCommit,
+          description: METRIC_DESCRIPTIONS.avgLinesPerCommit(),
+        },
+        largeCommitPercentage: {
+          value: sizeMetrics.largeCommitPercentage,
+          description: METRIC_DESCRIPTIONS.largeCommitPercentage(),
+        },
+        firstCommitAnalysis: {
+          value: sizeMetrics.firstCommitAnalysis,
+          description: METRIC_DESCRIPTIONS.firstCommitAnalysis(),
+        },
+        avgFilesPerCommit: {
+          value: sizeMetrics.avgFilesPerCommit,
+          description: METRIC_DESCRIPTIONS.avgFilesPerCommit(),
+        },
+        commitMessagePatterns: {
+          value: commitMessagePatterns,
+          description: METRIC_DESCRIPTIONS.commitMessagePatterns(),
+        },
+        burstyCommitPercentage: {
+          value: burstyCommitPercentage,
+          description: METRIC_DESCRIPTIONS.burstyCommitPercentage(),
+        },
+        testFileRatio: {
+          value: testFileRatio,
+          description: METRIC_DESCRIPTIONS.testFileRatio(),
+        },
       },
     };
   }

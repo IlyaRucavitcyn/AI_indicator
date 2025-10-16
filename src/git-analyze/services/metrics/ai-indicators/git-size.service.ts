@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CommitInfo } from '../../git.service';
+import { METRIC_THRESHOLDS } from '../metric-thresholds.constants';
 
 export interface GitSizeMetrics {
   avgLinesPerCommit: number;
@@ -13,8 +14,6 @@ export interface GitSizeMetrics {
 
 @Injectable()
 export class GitSizeService {
-  private readonly LARGE_COMMIT_THRESHOLD = 500; // lines
-
   /**
    * Calculates all size-related metrics
    * @param commits Array of commit information
@@ -83,11 +82,15 @@ export class GitSizeService {
     const stdDev = Math.sqrt(variance);
 
     // Count commits that are either:
-    // 1. More than 2 standard deviations above the mean, OR
+    // 1. More than N standard deviations above the mean, OR
     // 2. Above the absolute threshold
     const largeCommits = commits.filter((commit) => {
       const lines = commit.insertions + commit.deletions;
-      return lines > mean + 2 * stdDev || lines > this.LARGE_COMMIT_THRESHOLD;
+      return (
+        lines >
+          mean + METRIC_THRESHOLDS.LARGE_COMMIT_STD_DEV_MULTIPLIER * stdDev ||
+        lines > METRIC_THRESHOLDS.LARGE_COMMIT_LINES
+      );
     });
 
     return Math.round((largeCommits.length / commits.length) * 10000) / 100;
@@ -112,10 +115,11 @@ export class GitSizeService {
 
     // Calculate average of remaining commits (excluding first)
     if (commits.length === 1) {
-      // If only one commit, it's suspicious if it's very large (>500 lines)
+      // If only one commit, it's suspicious if it's very large
       return {
         firstCommitLines,
-        isSuspiciouslyLarge: firstCommitLines > 500,
+        isSuspiciouslyLarge:
+          firstCommitLines > METRIC_THRESHOLDS.FIRST_COMMIT_SINGLE_THRESHOLD,
       };
     }
 
@@ -126,10 +130,12 @@ export class GitSizeService {
         0,
       ) / remainingCommits.length;
 
-    // First commit is suspicious if it's 3x larger than the average of other commits
-    // OR if it's larger than 1000 lines
+    // First commit is suspicious if it's Nx larger than the average of other commits
+    // OR if it's larger than absolute threshold
     const isSuspiciouslyLarge =
-      firstCommitLines > avgRemainingLines * 3 || firstCommitLines > 1000;
+      firstCommitLines >
+        avgRemainingLines * METRIC_THRESHOLDS.FIRST_COMMIT_MULTIPLIER ||
+      firstCommitLines > METRIC_THRESHOLDS.FIRST_COMMIT_ABSOLUTE_THRESHOLD;
 
     return { firstCommitLines, isSuspiciouslyLarge };
   }
