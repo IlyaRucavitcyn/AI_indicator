@@ -136,16 +136,37 @@ describe('AnalyzerService', () => {
             },
           ],
           aiIndicators: {
-            avgLinesPerCommit: 39,
-            largeCommitPercentage: 0,
-            firstCommitAnalysis: {
-              lines: 60,
-              isSuspicious: false,
+            avgLinesPerCommit: {
+              value: 39,
+              description: expect.any(String),
             },
-            avgFilesPerCommit: 3.33,
-            commitMessagePatterns: 0,
-            burstyCommitPercentage: 0,
-            testFileRatio: 0,
+            largeCommitPercentage: {
+              value: 0,
+              description: expect.any(String),
+            },
+            firstCommitAnalysis: {
+              value: {
+                lines: 60,
+                isSuspicious: false,
+              },
+              description: expect.any(String),
+            },
+            avgFilesPerCommit: {
+              value: 3.33,
+              description: expect.any(String),
+            },
+            commitMessagePatterns: {
+              value: 0,
+              description: expect.any(String),
+            },
+            burstyCommitPercentage: {
+              value: 0,
+              description: expect.any(String),
+            },
+            testFileRatio: {
+              value: 0,
+              description: expect.any(String),
+            },
           },
         },
         analyzedAt: expect.any(String),
@@ -199,16 +220,37 @@ describe('AnalyzerService', () => {
         topContributor: '',
         contributorStats: [],
         aiIndicators: {
-          avgLinesPerCommit: 0,
-          largeCommitPercentage: 0,
-          firstCommitAnalysis: {
-            lines: 0,
-            isSuspicious: false,
+          avgLinesPerCommit: {
+            value: 0,
+            description: expect.any(String),
           },
-          avgFilesPerCommit: 0,
-          commitMessagePatterns: 0,
-          burstyCommitPercentage: 0,
-          testFileRatio: 0,
+          largeCommitPercentage: {
+            value: 0,
+            description: expect.any(String),
+          },
+          firstCommitAnalysis: {
+            value: {
+              lines: 0,
+              isSuspicious: false,
+            },
+            description: expect.any(String),
+          },
+          avgFilesPerCommit: {
+            value: 0,
+            description: expect.any(String),
+          },
+          commitMessagePatterns: {
+            value: 0,
+            description: expect.any(String),
+          },
+          burstyCommitPercentage: {
+            value: 0,
+            description: expect.any(String),
+          },
+          testFileRatio: {
+            value: 0,
+            description: expect.any(String),
+          },
         },
       });
     });
@@ -311,16 +353,37 @@ describe('AnalyzerService', () => {
           },
         ],
         aiIndicators: {
-          avgLinesPerCommit: 60,
-          largeCommitPercentage: 0,
-          firstCommitAnalysis: {
-            lines: 60,
-            isSuspicious: false,
+          avgLinesPerCommit: {
+            value: 60,
+            description: expect.any(String),
           },
-          avgFilesPerCommit: 5,
-          commitMessagePatterns: 0,
-          burstyCommitPercentage: 0,
-          testFileRatio: 0,
+          largeCommitPercentage: {
+            value: 0,
+            description: expect.any(String),
+          },
+          firstCommitAnalysis: {
+            value: {
+              lines: 60,
+              isSuspicious: false,
+            },
+            description: expect.any(String),
+          },
+          avgFilesPerCommit: {
+            value: 5,
+            description: expect.any(String),
+          },
+          commitMessagePatterns: {
+            value: 0,
+            description: expect.any(String),
+          },
+          burstyCommitPercentage: {
+            value: 0,
+            description: expect.any(String),
+          },
+          testFileRatio: {
+            value: 0,
+            description: expect.any(String),
+          },
         },
       });
     });

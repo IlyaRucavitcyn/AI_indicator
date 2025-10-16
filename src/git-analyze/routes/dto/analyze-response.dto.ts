@@ -10,17 +10,22 @@ export interface ContributorStats {
   commitCount: number;
 }
 
+export interface AIIndicatorMetric<T = number> {
+  value: T;
+  description: string;
+}
+
 export interface AIIndicators {
-  avgLinesPerCommit: number;
-  largeCommitPercentage: number;
-  firstCommitAnalysis: {
+  avgLinesPerCommit: AIIndicatorMetric<number>;
+  largeCommitPercentage: AIIndicatorMetric<number>;
+  firstCommitAnalysis: AIIndicatorMetric<{
     lines: number;
     isSuspicious: boolean;
-  };
-  avgFilesPerCommit: number;
-  commitMessagePatterns: number;
-  burstyCommitPercentage: number;
-  testFileRatio: number;
+  }>;
+  avgFilesPerCommit: AIIndicatorMetric<number>;
+  commitMessagePatterns: AIIndicatorMetric<number>;
+  burstyCommitPercentage: AIIndicatorMetric<number>;
+  testFileRatio: AIIndicatorMetric<number>;
 }
 
 export interface GitMetrics {

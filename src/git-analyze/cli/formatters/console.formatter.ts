@@ -69,29 +69,61 @@ export class ConsoleFormatter {
     let aiIndicatorsTable = '';
     if (metrics.aiIndicators) {
       const aiTable = new Table({
-        head: [chalk.bold.blue('AI Indicator'), chalk.bold.blue('Value')],
+        head: [
+          chalk.bold.blue('AI Indicator'),
+          chalk.bold.blue('Value'),
+          chalk.bold.blue('Description'),
+        ],
         style: {
           head: ['cyan'],
           border: ['gray'],
         },
+        colWidths: [25, 15, 60],
+        wordWrap: true,
       });
 
       const ai = metrics.aiIndicators;
-      const firstCommitStatus = ai.firstCommitAnalysis.isSuspicious
+      const firstCommitValue = ai.firstCommitAnalysis.value;
+      const firstCommitStatus = firstCommitValue.isSuspicious
         ? chalk.red('⚠️  Suspicious')
         : chalk.green('✓ Normal');
 
       aiTable.push(
-        ['Avg Lines/Commit', chalk.bold(ai.avgLinesPerCommit.toString())],
-        ['Large Commits %', chalk.bold(`${ai.largeCommitPercentage}%`)],
+        [
+          'Avg Lines/Commit',
+          chalk.bold(`${ai.avgLinesPerCommit.value}`),
+          chalk.gray(ai.avgLinesPerCommit.description),
+        ],
+        [
+          'Large Commits %',
+          chalk.bold(`${ai.largeCommitPercentage.value}%`),
+          chalk.gray(ai.largeCommitPercentage.description),
+        ],
         [
           'First Commit Size',
-          `${chalk.bold(ai.firstCommitAnalysis.lines.toString())} lines - ${firstCommitStatus}`,
+          `${chalk.bold(`${firstCommitValue.lines}`)} lines - ${firstCommitStatus}`,
+          chalk.gray(ai.firstCommitAnalysis.description),
         ],
-        ['Avg Files/Commit', chalk.bold(ai.avgFilesPerCommit.toString())],
-        ['Commit Msg Patterns %', chalk.bold(`${ai.commitMessagePatterns}%`)],
-        ['Bursty Commits %', chalk.bold(`${ai.burstyCommitPercentage}%`)],
-        ['Test File Ratio %', chalk.bold(`${ai.testFileRatio}%`)],
+        [
+          'Avg Files/Commit',
+          chalk.bold(`${ai.avgFilesPerCommit.value}`),
+          chalk.gray(ai.avgFilesPerCommit.description),
+        ],
+        [
+          'Commit Msg Patterns %',
+          chalk.bold(`${ai.commitMessagePatterns.value}%`),
+          chalk.gray(ai.commitMessagePatterns.description),
+        ],
+        [
+          'Bursty Commits %',
+          chalk.bold(`${ai.burstyCommitPercentage.value}%`),
+          chalk.gray(ai.burstyCommitPercentage.description),
+        ],
+        [
+          'Test File Ratio %',
+          chalk.bold(`${ai.testFileRatio.value}%`),
+          chalk.gray(ai.testFileRatio.description),
+        ],
       );
 
       aiIndicatorsTable = `\n${chalk.bold.blue('🤖 AI Assistance Indicators:')}\n${aiTable.toString()}`;
