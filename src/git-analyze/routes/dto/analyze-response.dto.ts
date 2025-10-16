@@ -26,6 +26,7 @@ export interface AIIndicators {
   commitMessagePatterns: AIIndicatorMetric<number>;
   burstyCommitPercentage: AIIndicatorMetric<number>;
   testFileRatio: AIIndicatorMetric<number>;
+  codeCommentRatio: AIIndicatorMetric<number>;
 }
 
 export interface GitMetrics {

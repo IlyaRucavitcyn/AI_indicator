@@ -12,6 +12,7 @@ import { GitSizeService } from '../services/metrics/ai-indicators/git-size.servi
 import { GitMessagesService } from '../services/metrics/ai-indicators/git-messages.service';
 import { GitTimingService } from '../services/metrics/ai-indicators/git-timing.service';
 import { CodeQualityService } from '../services/metrics/ai-indicators/code-quality.service';
+import { CodeCommentAnalysisService } from '../services/metrics/ai-indicators/code-comment-analysis.service';
 import { ConsoleFormatter } from './formatters/console.formatter';
 import { JsonFormatter } from './formatters/json.formatter';
 import { HtmlFormatter } from './formatters/html.formatter';
@@ -74,6 +75,7 @@ program
         const gitMessagesService = new GitMessagesService();
         const gitTimingService = new GitTimingService();
         const codeQualityService = new CodeQualityService();
+        const codeCommentAnalysisService = new CodeCommentAnalysisService();
         const analyzerService = new AnalyzerService(
           gitService,
           tempService,
@@ -82,6 +84,7 @@ program
           gitMessagesService,
           gitTimingService,
           codeQualityService,
+          codeCommentAnalysisService,
         );
 
         // Perform analysis

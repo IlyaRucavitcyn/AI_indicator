@@ -19,6 +19,9 @@ export const METRIC_THRESHOLDS = {
 
   // Test File Ratio
   LOW_TEST_COVERAGE_THRESHOLD: 20, // Percentage threshold for low test coverage
+
+  // Code Comment Ratio
+  HIGH_COMMENT_RATIO_THRESHOLD: 30, // Percentage threshold for excessive comments
 } as const;
 
 /**
@@ -45,4 +48,7 @@ export const METRIC_DESCRIPTIONS = {
 
   testFileRatio: () =>
     `Percentage of commits that modify test files. Low values (<${METRIC_THRESHOLDS.LOW_TEST_COVERAGE_THRESHOLD}%) might suggest AI-generated code without proper test coverage.`,
+
+  codeCommentRatio: () =>
+    `Percentage of comment lines relative to code lines. High values (>${METRIC_THRESHOLDS.HIGH_COMMENT_RATIO_THRESHOLD}%) may indicate AI-generated code with excessive explanatory comments.`,
 } as const;

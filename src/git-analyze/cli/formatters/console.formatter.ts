@@ -78,7 +78,7 @@ export class ConsoleFormatter {
           head: ['cyan'],
           border: ['gray'],
         },
-        colWidths: [25, 15, 60],
+        colWidths: [25, 15, 50],
         wordWrap: true,
       });
 
@@ -123,6 +123,11 @@ export class ConsoleFormatter {
           'Test File Ratio %',
           chalk.bold(`${ai.testFileRatio.value}%`),
           chalk.gray(ai.testFileRatio.description),
+        ],
+        [
+          'Code Comment Ratio %',
+          chalk.bold(`${ai.codeCommentRatio.value}%`),
+          chalk.gray(ai.codeCommentRatio.description),
         ],
       );
 

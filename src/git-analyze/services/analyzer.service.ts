@@ -10,6 +10,7 @@ import { GitSizeService } from './metrics/ai-indicators/git-size.service';
 import { GitMessagesService } from './metrics/ai-indicators/git-messages.service';
 import { GitTimingService } from './metrics/ai-indicators/git-timing.service';
 import { CodeQualityService } from './metrics/ai-indicators/code-quality.service';
+import { CodeCommentAnalysisService } from './metrics/ai-indicators/code-comment-analysis.service';
 import { METRIC_DESCRIPTIONS } from './metrics/metric-thresholds.constants';
 
 @Injectable()
@@ -22,6 +23,7 @@ export class AnalyzerService {
     private readonly gitMessagesService: GitMessagesService,
     private readonly gitTimingService: GitTimingService,
     private readonly codeQualityService: CodeQualityService,
+    private readonly codeCommentAnalysisService: CodeCommentAnalysisService,
   ) {}
 
   /**
@@ -59,7 +61,7 @@ export class AnalyzerService {
       const repoInfo = await this.gitService.getRepositoryInfo(git);
 
       // Calculate metrics
-      const metrics = this.calculateMetrics(commits);
+      const metrics = this.calculateMetrics(commits, repoPath);
 
       // Extract repository name
       const repository = this.tempService.extractRepoName(repositoryUrl);
@@ -83,9 +85,13 @@ export class AnalyzerService {
   /**
    * Calculates metrics from commit history
    * @param commits Array of commit information
+   * @param repoPath Path to the cloned repository
    * @returns Calculated metrics
    */
-  private calculateMetrics(commits: CommitInfo[]): GitMetrics {
+  private calculateMetrics(
+    commits: CommitInfo[],
+    repoPath: string,
+  ): GitMetrics {
     // Get basic metrics from BasicMetricsService
     const basicMetrics =
       this.basicMetricsService.calculateBasicMetrics(commits);
@@ -99,6 +105,8 @@ export class AnalyzerService {
     const burstyCommitPercentage =
       this.gitTimingService.analyzeBurstyCommits(commits);
     const testFileRatio = this.codeQualityService.analyzeTestFileRatio(commits);
+    const codeCommentRatio =
+      this.codeCommentAnalysisService.analyzeCommentRatio(repoPath);
 
     return {
       ...basicMetrics,
@@ -130,6 +138,10 @@ export class AnalyzerService {
         testFileRatio: {
           value: testFileRatio,
           description: METRIC_DESCRIPTIONS.testFileRatio(),
+        },
+        codeCommentRatio: {
+          value: codeCommentRatio,
+          description: METRIC_DESCRIPTIONS.codeCommentRatio(),
         },
       },
     };

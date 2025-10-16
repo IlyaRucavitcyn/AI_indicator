@@ -7,6 +7,7 @@ import { GitSizeService } from './metrics/ai-indicators/git-size.service';
 import { GitMessagesService } from './metrics/ai-indicators/git-messages.service';
 import { GitTimingService } from './metrics/ai-indicators/git-timing.service';
 import { CodeQualityService } from './metrics/ai-indicators/code-quality.service';
+import { CodeCommentAnalysisService } from './metrics/ai-indicators/code-comment-analysis.service';
 
 describe('AnalyzerService', () => {
   let service: AnalyzerService;
@@ -17,6 +18,7 @@ describe('AnalyzerService', () => {
   let gitMessagesService: GitMessagesService;
   let gitTimingService: GitTimingService;
   let codeQualityService: CodeQualityService;
+  let codeCommentAnalysisService: CodeCommentAnalysisService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,6 +31,7 @@ describe('AnalyzerService', () => {
         GitMessagesService,
         GitTimingService,
         CodeQualityService,
+        CodeCommentAnalysisService,
       ],
     }).compile();
 
@@ -40,6 +43,9 @@ describe('AnalyzerService', () => {
     gitMessagesService = module.get<GitMessagesService>(GitMessagesService);
     gitTimingService = module.get<GitTimingService>(GitTimingService);
     codeQualityService = module.get<CodeQualityService>(CodeQualityService);
+    codeCommentAnalysisService = module.get<CodeCommentAnalysisService>(
+      CodeCommentAnalysisService,
+    );
   });
 
   afterEach(() => {
@@ -167,6 +173,10 @@ describe('AnalyzerService', () => {
               value: 0,
               description: expect.any(String),
             },
+            codeCommentRatio: {
+              value: 0,
+              description: expect.any(String),
+            },
           },
         },
         analyzedAt: expect.any(String),
@@ -251,6 +261,10 @@ describe('AnalyzerService', () => {
             value: 0,
             description: expect.any(String),
           },
+          codeCommentRatio: {
+            value: 0,
+            description: expect.any(String),
+          },
         },
       });
     });
@@ -318,8 +332,14 @@ describe('AnalyzerService', () => {
         .mockReturnValue(0);
       jest.spyOn(gitTimingService, 'analyzeBurstyCommits').mockReturnValue(0);
       jest.spyOn(codeQualityService, 'analyzeTestFileRatio').mockReturnValue(0);
+      jest
+        .spyOn(codeCommentAnalysisService, 'analyzeCommentRatio')
+        .mockReturnValue(0);
 
-      const metrics = (service as any).calculateMetrics(commits);
+      const metrics = (service as any).calculateMetrics(
+        commits,
+        '/tmp/test-repo',
+      );
 
       // Verify all services were called
       expect(basicMetricsService.calculateBasicMetrics).toHaveBeenCalledWith(
@@ -335,6 +355,9 @@ describe('AnalyzerService', () => {
       expect(codeQualityService.analyzeTestFileRatio).toHaveBeenCalledWith(
         commits,
       );
+      expect(
+        codeCommentAnalysisService.analyzeCommentRatio,
+      ).toHaveBeenCalledWith('/tmp/test-repo');
 
       // Verify the structure is correct
       expect(metrics).toEqual({
@@ -381,6 +404,10 @@ describe('AnalyzerService', () => {
             description: expect.any(String),
           },
           testFileRatio: {
+            value: 0,
+            description: expect.any(String),
+          },
+          codeCommentRatio: {
             value: 0,
             description: expect.any(String),
           },

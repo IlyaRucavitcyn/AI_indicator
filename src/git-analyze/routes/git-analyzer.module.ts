@@ -8,6 +8,7 @@ import { GitSizeService } from '../services/metrics/ai-indicators/git-size.servi
 import { GitMessagesService } from '../services/metrics/ai-indicators/git-messages.service';
 import { GitTimingService } from '../services/metrics/ai-indicators/git-timing.service';
 import { CodeQualityService } from '../services/metrics/ai-indicators/code-quality.service';
+import { CodeCommentAnalysisService } from '../services/metrics/ai-indicators/code-comment-analysis.service';
 
 @Module({
   controllers: [GitAnalyzerController],
@@ -20,6 +21,7 @@ import { CodeQualityService } from '../services/metrics/ai-indicators/code-quali
     GitMessagesService,
     GitTimingService,
     CodeQualityService,
+    CodeCommentAnalysisService,
   ],
   exports: [AnalyzerService],
 })
