@@ -105,8 +105,25 @@ export class AnalyzerService {
     const burstyCommitPercentage =
       this.gitTimingService.analyzeBurstyCommits(commits);
     const testFileRatio = this.codeQualityService.analyzeTestFileRatio(commits);
+
+    // Code comment analysis with progress indication
+    console.log('📝 Analyzing code comments...');
+    let lastProgress = 0;
     const codeCommentRatio =
-      this.codeCommentAnalysisService.analyzeCommentRatio(repoPath);
+      this.codeCommentAnalysisService.analyzeCommentRatio(
+        repoPath,
+        (current, total) => {
+          const progress = Math.floor((current / total) * 100);
+          // Only update every 10% to avoid too much output
+          if (progress >= lastProgress + 10 || current === total) {
+            process.stdout.write(`\r📝 Analyzing code comments... ${current}/${total} files (${progress}%)`);
+            lastProgress = progress;
+            if (current === total) {
+              process.stdout.write('\n');
+            }
+          }
+        },
+      );
 
     return {
       ...basicMetrics,

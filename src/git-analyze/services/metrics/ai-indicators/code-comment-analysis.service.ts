@@ -31,11 +31,20 @@ export class CodeCommentAnalysisService {
   /**
    * Analyzes comment ratio in repository files
    * @param repoPath Path to the cloned repository
+   * @param onProgress Optional callback for progress updates
    * @returns Comment ratio as percentage
    */
-  analyzeCommentRatio(repoPath: string): number {
+  analyzeCommentRatio(
+    repoPath: string,
+    onProgress?: (current: number, total: number) => void,
+  ): number {
     const files = this.getAllSourceFiles(repoPath);
-    const results = files.map((file) => this.analyzeFile(file));
+    const results = files.map((file, index) => {
+      if (onProgress) {
+        onProgress(index + 1, files.length);
+      }
+      return this.analyzeFile(file);
+    });
 
     const totals = results.reduce(
       (acc, result) => ({
