@@ -56,7 +56,9 @@ export class AnalyzerService {
       git = cloneResult.git;
       repoPath = cloneResult.repoPath;
       const cloneTotalTime = Math.floor((Date.now() - cloneStartTime) / 1000);
-      process.stdout.write(`\r✓ Repository cloned successfully (${cloneTotalTime}s)\n`);
+      process.stdout.write(
+        `\r✓ Repository cloned successfully (${cloneTotalTime}s)\n`,
+      );
 
       // Validate repository
       const isValid = await this.gitService.isValidRepository(git);
@@ -74,7 +76,9 @@ export class AnalyzerService {
 
       const commits = await this.gitService.getCommitHistory(git);
       clearInterval(historyProgressInterval);
-      const historyTotalTime = Math.floor((Date.now() - historyStartTime) / 1000);
+      const historyTotalTime = Math.floor(
+        (Date.now() - historyStartTime) / 1000,
+      );
       process.stdout.write(
         `\r✓ Loaded ${commits.length} commits (${historyTotalTime}s)\n`,
       );
@@ -138,7 +142,9 @@ export class AnalyzerService {
           const progress = Math.floor((current / total) * 100);
           // Only update every 10% to avoid too much output
           if (progress >= lastProgress + 10 || current === total) {
-            process.stdout.write(`\r📝 Analyzing code comments... ${current}/${total} files (${progress}%)`);
+            process.stdout.write(
+              `\r📝 Analyzing code comments... ${current}/${total} files (${progress}%)`,
+            );
             lastProgress = progress;
             if (current === total) {
               process.stdout.write('\n');

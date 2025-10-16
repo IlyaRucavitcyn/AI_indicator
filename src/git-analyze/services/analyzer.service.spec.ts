@@ -357,7 +357,7 @@ describe('AnalyzerService', () => {
       );
       expect(
         codeCommentAnalysisService.analyzeCommentRatio,
-      ).toHaveBeenCalledWith('/tmp/test-repo');
+      ).toHaveBeenCalledWith('/tmp/test-repo', expect.any(Function));
 
       // Verify the structure is correct
       expect(metrics).toEqual({
