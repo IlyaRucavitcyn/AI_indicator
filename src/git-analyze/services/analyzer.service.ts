@@ -10,6 +10,7 @@ import { GitSizeService } from './metrics/ai-indicators/git-size.service';
 import { GitMessagesService } from './metrics/ai-indicators/git-messages.service';
 import { GitTimingService } from './metrics/ai-indicators/git-timing.service';
 import { CodeQualityService } from './metrics/ai-indicators/code-quality.service';
+import { CodeCommentAnalysisService } from './metrics/ai-indicators/code-comment-analysis.service';
 import { METRIC_DESCRIPTIONS } from './metrics/metric-thresholds.constants';
 
 @Injectable()
@@ -22,6 +23,7 @@ export class AnalyzerService {
     private readonly gitMessagesService: GitMessagesService,
     private readonly gitTimingService: GitTimingService,
     private readonly codeQualityService: CodeQualityService,
+    private readonly codeCommentAnalysisService: CodeCommentAnalysisService,
   ) {}
 
   /**
@@ -38,13 +40,25 @@ export class AnalyzerService {
     let repoPath: string | undefined;
 
     try {
-      // Clone the repository
+      // Clone the repository with progress indication
+      process.stdout.write('📥 Cloning repository...');
+      const cloneStartTime = Date.now();
+      const cloneProgressInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - cloneStartTime) / 1000);
+        process.stdout.write(`\r📥 Cloning repository... ${elapsed}s`);
+      }, 1000);
+
       const cloneResult = await this.gitService.cloneRepository(
         repositoryUrl,
         branch,
       );
+      clearInterval(cloneProgressInterval);
       git = cloneResult.git;
       repoPath = cloneResult.repoPath;
+      const cloneTotalTime = Math.floor((Date.now() - cloneStartTime) / 1000);
+      process.stdout.write(
+        `\r✓ Repository cloned successfully (${cloneTotalTime}s)\n`,
+      );
 
       // Validate repository
       const isValid = await this.gitService.isValidRepository(git);
@@ -52,14 +66,28 @@ export class AnalyzerService {
         throw new Error('Invalid Git repository');
       }
 
-      // Get commit history
+      // Get commit history with progress indication
+      process.stdout.write('📜 Fetching commit history...');
+      const historyStartTime = Date.now();
+      const historyProgressInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - historyStartTime) / 1000);
+        process.stdout.write(`\r📜 Fetching commit history... ${elapsed}s`);
+      }, 1000);
+
       const commits = await this.gitService.getCommitHistory(git);
+      clearInterval(historyProgressInterval);
+      const historyTotalTime = Math.floor(
+        (Date.now() - historyStartTime) / 1000,
+      );
+      process.stdout.write(
+        `\r✓ Loaded ${commits.length} commits (${historyTotalTime}s)\n`,
+      );
 
       // Get repository info
       const repoInfo = await this.gitService.getRepositoryInfo(git);
 
       // Calculate metrics
-      const metrics = this.calculateMetrics(commits);
+      const metrics = this.calculateMetrics(commits, repoPath);
 
       // Extract repository name
       const repository = this.tempService.extractRepoName(repositoryUrl);
@@ -83,9 +111,13 @@ export class AnalyzerService {
   /**
    * Calculates metrics from commit history
    * @param commits Array of commit information
+   * @param repoPath Path to the cloned repository
    * @returns Calculated metrics
    */
-  private calculateMetrics(commits: CommitInfo[]): GitMetrics {
+  private calculateMetrics(
+    commits: CommitInfo[],
+    repoPath: string,
+  ): GitMetrics {
     // Get basic metrics from BasicMetricsService
     const basicMetrics =
       this.basicMetricsService.calculateBasicMetrics(commits);
@@ -99,6 +131,27 @@ export class AnalyzerService {
     const burstyCommitPercentage =
       this.gitTimingService.analyzeBurstyCommits(commits);
     const testFileRatio = this.codeQualityService.analyzeTestFileRatio(commits);
+
+    // Code comment analysis with progress indication
+    console.log('📝 Analyzing code comments...');
+    let lastProgress = 0;
+    const codeCommentRatio =
+      this.codeCommentAnalysisService.analyzeCommentRatio(
+        repoPath,
+        (current, total) => {
+          const progress = Math.floor((current / total) * 100);
+          // Only update every 10% to avoid too much output
+          if (progress >= lastProgress + 10 || current === total) {
+            process.stdout.write(
+              `\r📝 Analyzing code comments... ${current}/${total} files (${progress}%)`,
+            );
+            lastProgress = progress;
+            if (current === total) {
+              process.stdout.write('\n');
+            }
+          }
+        },
+      );
 
     return {
       ...basicMetrics,
@@ -130,6 +183,10 @@ export class AnalyzerService {
         testFileRatio: {
           value: testFileRatio,
           description: METRIC_DESCRIPTIONS.testFileRatio(),
+        },
+        codeCommentRatio: {
+          value: codeCommentRatio,
+          description: METRIC_DESCRIPTIONS.codeCommentRatio(),
         },
       },
     };

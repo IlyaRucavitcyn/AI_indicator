@@ -357,6 +357,14 @@ export class HtmlFormatter {
             </div>
             <div class="ai-metric-description">${ai.testFileRatio.description}</div>
         </div>
+
+        <div class="ai-metric">
+            <div class="ai-metric-header">
+                <span class="ai-metric-name">Code Comment Ratio %</span>
+                <span class="ai-metric-value">${ai.codeCommentRatio.value}%</span>
+            </div>
+            <div class="ai-metric-description">${ai.codeCommentRatio.description}</div>
+        </div>
     </div>`;
   }
 }
