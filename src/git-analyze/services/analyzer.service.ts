@@ -40,13 +40,23 @@ export class AnalyzerService {
     let repoPath: string | undefined;
 
     try {
-      // Clone the repository
+      // Clone the repository with progress indication
+      process.stdout.write('📥 Cloning repository...');
+      const cloneStartTime = Date.now();
+      const cloneProgressInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - cloneStartTime) / 1000);
+        process.stdout.write(`\r📥 Cloning repository... ${elapsed}s`);
+      }, 1000);
+
       const cloneResult = await this.gitService.cloneRepository(
         repositoryUrl,
         branch,
       );
+      clearInterval(cloneProgressInterval);
       git = cloneResult.git;
       repoPath = cloneResult.repoPath;
+      const cloneTotalTime = Math.floor((Date.now() - cloneStartTime) / 1000);
+      process.stdout.write(`\r✓ Repository cloned successfully (${cloneTotalTime}s)\n`);
 
       // Validate repository
       const isValid = await this.gitService.isValidRepository(git);
@@ -54,8 +64,20 @@ export class AnalyzerService {
         throw new Error('Invalid Git repository');
       }
 
-      // Get commit history
+      // Get commit history with progress indication
+      process.stdout.write('📜 Fetching commit history...');
+      const historyStartTime = Date.now();
+      const historyProgressInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - historyStartTime) / 1000);
+        process.stdout.write(`\r📜 Fetching commit history... ${elapsed}s`);
+      }, 1000);
+
       const commits = await this.gitService.getCommitHistory(git);
+      clearInterval(historyProgressInterval);
+      const historyTotalTime = Math.floor((Date.now() - historyStartTime) / 1000);
+      process.stdout.write(
+        `\r✓ Loaded ${commits.length} commits (${historyTotalTime}s)\n`,
+      );
 
       // Get repository info
       const repoInfo = await this.gitService.getRepositoryInfo(git);
