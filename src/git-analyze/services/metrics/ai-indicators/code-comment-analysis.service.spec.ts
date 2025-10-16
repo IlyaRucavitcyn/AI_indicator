@@ -34,7 +34,7 @@ describe('CodeCommentAnalysisService', () => {
     it('should calculate comment ratio for JavaScript files', () => {
       const mockDirEntries = [
         { name: 'file1.js', isDirectory: () => false, isFile: () => true },
-      ] as fs.Dirent[];
+      ] as unknown as fs.Dirent[];
 
       const mockFileContent = `// This is a comment
 function hello() {
@@ -42,7 +42,7 @@ function hello() {
   console.log('hello');
 }`;
 
-      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries);
+      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries as any);
       jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileContent);
 
       const result = service.analyzeCommentRatio('/fake/path');
@@ -54,7 +54,7 @@ function hello() {
     it('should calculate comment ratio for TypeScript files with block comments', () => {
       const mockDirEntries = [
         { name: 'file1.ts', isDirectory: () => false, isFile: () => true },
-      ] as fs.Dirent[];
+      ] as unknown as fs.Dirent[];
 
       const mockFileContent = `/*
  * Multi-line comment
@@ -64,7 +64,7 @@ function test() {
   return true;
 }`;
 
-      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries);
+      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries as any);
       jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileContent);
 
       const result = service.analyzeCommentRatio('/fake/path');
@@ -76,7 +76,7 @@ function test() {
     it('should calculate comment ratio for Python files', () => {
       const mockDirEntries = [
         { name: 'script.py', isDirectory: () => false, isFile: () => true },
-      ] as fs.Dirent[];
+      ] as unknown as fs.Dirent[];
 
       const mockFileContent = `# This is a comment
 def hello():
@@ -84,7 +84,7 @@ def hello():
     print("hello")
     return True`;
 
-      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries);
+      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries as any);
       jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileContent);
 
       const result = service.analyzeCommentRatio('/fake/path');
@@ -98,15 +98,15 @@ def hello():
         { name: 'node_modules', isDirectory: () => true, isFile: () => false },
         { name: '.git', isDirectory: () => true, isFile: () => false },
         { name: 'file1.js', isDirectory: () => false, isFile: () => true },
-      ] as fs.Dirent[];
+      ] as unknown as fs.Dirent[];
 
       const mockFileContent = `// Comment
 const x = 1;`;
 
       jest
         .spyOn(fs, 'readdirSync')
-        .mockReturnValueOnce(mockDirEntries)
-        .mockReturnValue([]);
+        .mockReturnValueOnce(mockDirEntries as any)
+        .mockReturnValue([] as any);
       jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileContent);
 
       const result = service.analyzeCommentRatio('/fake/path');
@@ -119,11 +119,11 @@ const x = 1;`;
       const mockRootEntries = [
         { name: 'src', isDirectory: () => true, isFile: () => false },
         { name: 'index.js', isDirectory: () => false, isFile: () => true },
-      ] as fs.Dirent[];
+      ] as unknown as fs.Dirent[];
 
       const mockSrcEntries = [
         { name: 'utils.ts', isDirectory: () => false, isFile: () => true },
-      ] as fs.Dirent[];
+      ] as unknown as fs.Dirent[];
 
       const indexContent = `// Main file
 export function main() {}`;
@@ -136,8 +136,8 @@ export function util() {
 
       jest
         .spyOn(fs, 'readdirSync')
-        .mockReturnValueOnce(mockRootEntries)
-        .mockReturnValueOnce(mockSrcEntries);
+        .mockReturnValueOnce(mockRootEntries as any)
+        .mockReturnValueOnce(mockSrcEntries as any);
 
       jest
         .spyOn(fs, 'readFileSync')
@@ -155,7 +155,7 @@ export function util() {
     it('should ignore empty lines', () => {
       const mockDirEntries = [
         { name: 'file1.js', isDirectory: () => false, isFile: () => true },
-      ] as fs.Dirent[];
+      ] as unknown as fs.Dirent[];
 
       const mockFileContent = `// Comment
 
@@ -163,7 +163,7 @@ const x = 1;
 
 const y = 2;`;
 
-      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries);
+      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries as any);
       jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileContent);
 
       const result = service.analyzeCommentRatio('/fake/path');
@@ -175,12 +175,12 @@ const y = 2;`;
     it('should handle inline block comments on same line', () => {
       const mockDirEntries = [
         { name: 'file1.js', isDirectory: () => false, isFile: () => true },
-      ] as fs.Dirent[];
+      ] as unknown as fs.Dirent[];
 
       const mockFileContent = `/* inline comment */
 const x = 1;`;
 
-      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries);
+      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries as any);
       jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileContent);
 
       const result = service.analyzeCommentRatio('/fake/path');
@@ -192,13 +192,13 @@ const x = 1;`;
     it('should handle files with only comments', () => {
       const mockDirEntries = [
         { name: 'file1.js', isDirectory: () => false, isFile: () => true },
-      ] as fs.Dirent[];
+      ] as unknown as fs.Dirent[];
 
       const mockFileContent = `// Only comments
 // No code here
 // Just comments`;
 
-      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries);
+      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries as any);
       jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileContent);
 
       const result = service.analyzeCommentRatio('/fake/path');
@@ -210,13 +210,13 @@ const x = 1;`;
     it('should handle files with no comments', () => {
       const mockDirEntries = [
         { name: 'file1.js', isDirectory: () => false, isFile: () => true },
-      ] as fs.Dirent[];
+      ] as unknown as fs.Dirent[];
 
       const mockFileContent = `const x = 1;
 const y = 2;
 console.log(x + y);`;
 
-      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries);
+      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries as any);
       jest.spyOn(fs, 'readFileSync').mockReturnValue(mockFileContent);
 
       const result = service.analyzeCommentRatio('/fake/path');
@@ -228,9 +228,9 @@ console.log(x + y);`;
     it('should handle read errors gracefully', () => {
       const mockDirEntries = [
         { name: 'file1.js', isDirectory: () => false, isFile: () => true },
-      ] as fs.Dirent[];
+      ] as unknown as fs.Dirent[];
 
-      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries);
+      jest.spyOn(fs, 'readdirSync').mockReturnValue(mockDirEntries as any);
       jest.spyOn(fs, 'readFileSync').mockImplementation(() => {
         throw new Error('Read error');
       });
