@@ -279,6 +279,14 @@ npm run test:cov
 
 # Watch mode
 npm run test:watch
+
+# Performance tests
+npm run perf              # Run all performance tests
+npm run perf:basic        # Basic metrics performance
+npm run perf:all          # All services comparison
+npm run perf:scanner      # File system scanner performance
+npm run perf:code-analyzers  # Code analyzers performance
+npm run perf:analyzer     # Full integration performance
 ```
 
 ### Linting and Formatting

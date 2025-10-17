@@ -22,9 +22,11 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "perf": "npm run perf:basic && npm run perf:all && npm run perf:analyzer",
+    "perf": "npm run perf:basic && npm run perf:all && npm run perf:scanner && npm run perf:code-analyzers && npm run perf:analyzer",
     "perf:basic": "tsx test/performance/unit/basic-metrics.perf.ts",
     "perf:all": "tsx test/performance/unit/all-services.perf.ts",
+    "perf:scanner": "tsx test/performance/unit/file-system-scanner.perf.ts",
+    "perf:code-analyzers": "tsx test/performance/unit/code-analyzers.perf.ts",
     "perf:analyzer": "tsx test/performance/integration/analyzer.perf.ts"
   },
   "dependencies": {
