@@ -255,15 +255,11 @@ async function runBenchmarks() {
   console.log(`  5,000 files: ${ntLargeTime.toFixed(2)}ms`);
 
   console.log('\nRelative Performance (NonTypical vs Comment):');
-  console.log(
-    `  100 files: ${(ntSmallTime / commentSmallTime).toFixed(2)}x`,
-  );
+  console.log(`  100 files: ${(ntSmallTime / commentSmallTime).toFixed(2)}x`);
   console.log(
     `  1,000 files: ${(ntMediumTime / commentMediumTime).toFixed(2)}x`,
   );
-  console.log(
-    `  5,000 files: ${(ntLargeTime / commentLargeTime).toFixed(2)}x`,
-  );
+  console.log(`  5,000 files: ${(ntLargeTime / commentLargeTime).toFixed(2)}x`);
 
   // Test 4: Different file sizes impact
   console.log('\n========================================');

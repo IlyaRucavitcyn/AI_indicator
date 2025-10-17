@@ -355,9 +355,13 @@ describe('AnalyzerService', () => {
       jest.spyOn(codeQualityService, 'analyzeTestFileRatio').mockReturnValue(0);
 
       // Mock the new file-based architecture
-      jest.spyOn(fileSystemScannerService, 'scanRepository').mockImplementation(() => {});
+      jest
+        .spyOn(fileSystemScannerService, 'scanRepository')
+        .mockImplementation(() => {});
       jest.spyOn(codeCommentAnalysisService, 'getResult').mockReturnValue(0);
-      jest.spyOn(codeNonTypicalExpressionsService, 'getResult').mockReturnValue(0);
+      jest
+        .spyOn(codeNonTypicalExpressionsService, 'getResult')
+        .mockReturnValue(0);
 
       const metrics = (service as any).calculateMetrics(
         commits,

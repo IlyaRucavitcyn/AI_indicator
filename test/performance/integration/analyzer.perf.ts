@@ -57,7 +57,8 @@ async function runBenchmarks() {
     const codeQualityService = new CodeQualityService();
     const fileSystemScannerService = new FileSystemScannerService();
     const codeCommentAnalysisService = new CodeCommentAnalysisService();
-    const codeNonTypicalExpressionsService = new CodeNonTypicalExpressionsService();
+    const codeNonTypicalExpressionsService =
+      new CodeNonTypicalExpressionsService();
 
     const analyzerService = new AnalyzerService(
       gitService,

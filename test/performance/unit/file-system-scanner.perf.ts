@@ -237,9 +237,7 @@ async function runBenchmarks() {
     }),
   );
 
-  console.log(
-    '\n  ✓ node_modules and package-lock.json are correctly skipped',
-  );
+  console.log('\n  ✓ node_modules and package-lock.json are correctly skipped');
 
   MockRepositoryGenerator.cleanupMockRepository(filteredRepo);
 

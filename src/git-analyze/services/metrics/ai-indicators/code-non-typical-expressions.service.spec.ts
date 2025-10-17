@@ -20,7 +20,11 @@ describe('CodeNonTypicalExpressionsService', () => {
 
   describe('reset', () => {
     it('should reset state to zero', () => {
-      service.analyzeFile('/test/file.ts', 'for (let i = 0; i < 10; i++) {}', '.ts');
+      service.analyzeFile(
+        '/test/file.ts',
+        'for (let i = 0; i < 10; i++) {}',
+        '.ts',
+      );
       expect(service.getResult()).toBeGreaterThan(0);
 
       service.reset();
@@ -247,7 +251,11 @@ describe('CodeNonTypicalExpressionsService', () => {
 
     it('should return 100 when all files have non-typical expressions', () => {
       service.reset();
-      service.analyzeFile('/test/file1.ts', 'for (let i = 0; i < 10; i++) {}', '.ts');
+      service.analyzeFile(
+        '/test/file1.ts',
+        'for (let i = 0; i < 10; i++) {}',
+        '.ts',
+      );
       service.analyzeFile('/test/file2.ts', 'while (x) {}', '.ts');
       service.analyzeFile('/test/file3.ts', 'switch (y) {}', '.ts');
       expect(service.getResult()).toBe(100);
@@ -262,7 +270,11 @@ describe('CodeNonTypicalExpressionsService', () => {
 
     it('should calculate correct percentage for mixed files', () => {
       service.reset();
-      service.analyzeFile('/test/file1.ts', 'for (let i = 0; i < 10; i++) {}', '.ts');
+      service.analyzeFile(
+        '/test/file1.ts',
+        'for (let i = 0; i < 10; i++) {}',
+        '.ts',
+      );
       service.analyzeFile('/test/file2.ts', 'const x = 5;', '.ts');
       service.analyzeFile('/test/file3.ts', 'const y = 10;', '.ts');
       service.analyzeFile('/test/file4.ts', 'const z = 15;', '.ts');
@@ -273,7 +285,11 @@ describe('CodeNonTypicalExpressionsService', () => {
 
     it('should round percentage to 2 decimal places', () => {
       service.reset();
-      service.analyzeFile('/test/file1.ts', 'for (let i = 0; i < 10; i++) {}', '.ts');
+      service.analyzeFile(
+        '/test/file1.ts',
+        'for (let i = 0; i < 10; i++) {}',
+        '.ts',
+      );
       service.analyzeFile('/test/file2.ts', 'const x = 5;', '.ts');
       service.analyzeFile('/test/file3.ts', 'const y = 10;', '.ts');
 

@@ -1,4 +1,8 @@
-import { LanguageUtils, LANGUAGE_NAMES, FILE_EXTENSIONS } from './language-utils';
+import {
+  LanguageUtils,
+  LANGUAGE_NAMES,
+  FILE_EXTENSIONS,
+} from './language-utils';
 
 describe('LanguageUtils', () => {
   describe('getCommentSyntax', () => {
@@ -80,13 +84,21 @@ describe('LanguageUtils', () => {
 
   describe('getLanguageName', () => {
     it('should return correct language name for TypeScript', () => {
-      expect(LanguageUtils.getLanguageName('.ts')).toBe(LANGUAGE_NAMES.TYPESCRIPT);
-      expect(LanguageUtils.getLanguageName('.tsx')).toBe(LANGUAGE_NAMES.TYPESCRIPT);
+      expect(LanguageUtils.getLanguageName('.ts')).toBe(
+        LANGUAGE_NAMES.TYPESCRIPT,
+      );
+      expect(LanguageUtils.getLanguageName('.tsx')).toBe(
+        LANGUAGE_NAMES.TYPESCRIPT,
+      );
     });
 
     it('should return correct language name for JavaScript', () => {
-      expect(LanguageUtils.getLanguageName('.js')).toBe(LANGUAGE_NAMES.JAVASCRIPT);
-      expect(LanguageUtils.getLanguageName('.jsx')).toBe(LANGUAGE_NAMES.JAVASCRIPT);
+      expect(LanguageUtils.getLanguageName('.js')).toBe(
+        LANGUAGE_NAMES.JAVASCRIPT,
+      );
+      expect(LanguageUtils.getLanguageName('.jsx')).toBe(
+        LANGUAGE_NAMES.JAVASCRIPT,
+      );
     });
 
     it('should return correct language name for Python', () => {
@@ -102,14 +114,22 @@ describe('LanguageUtils', () => {
       expect(LanguageUtils.getLanguageName('.cs')).toBe(LANGUAGE_NAMES.CSHARP);
       expect(LanguageUtils.getLanguageName('.php')).toBe(LANGUAGE_NAMES.PHP);
       expect(LanguageUtils.getLanguageName('.rb')).toBe(LANGUAGE_NAMES.RUBY);
-      expect(LanguageUtils.getLanguageName('.swift')).toBe(LANGUAGE_NAMES.SWIFT);
+      expect(LanguageUtils.getLanguageName('.swift')).toBe(
+        LANGUAGE_NAMES.SWIFT,
+      );
       expect(LanguageUtils.getLanguageName('.kt')).toBe(LANGUAGE_NAMES.KOTLIN);
     });
 
     it('should return Unknown for unsupported extensions', () => {
-      expect(LanguageUtils.getLanguageName('.unknown')).toBe(LANGUAGE_NAMES.UNKNOWN);
-      expect(LanguageUtils.getLanguageName('.xyz')).toBe(LANGUAGE_NAMES.UNKNOWN);
-      expect(LanguageUtils.getLanguageName('.txt')).toBe(LANGUAGE_NAMES.UNKNOWN);
+      expect(LanguageUtils.getLanguageName('.unknown')).toBe(
+        LANGUAGE_NAMES.UNKNOWN,
+      );
+      expect(LanguageUtils.getLanguageName('.xyz')).toBe(
+        LANGUAGE_NAMES.UNKNOWN,
+      );
+      expect(LanguageUtils.getLanguageName('.txt')).toBe(
+        LANGUAGE_NAMES.UNKNOWN,
+      );
     });
   });
 

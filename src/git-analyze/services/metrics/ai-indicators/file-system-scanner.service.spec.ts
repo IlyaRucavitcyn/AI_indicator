@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FileSystemScannerService, FileAnalyzer } from './file-system-scanner.service';
+import {
+  FileSystemScannerService,
+  FileAnalyzer,
+} from './file-system-scanner.service';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -118,7 +121,11 @@ describe('FileSystemScannerService', () => {
 
       mockFs.readdirSync
         .mockReturnValueOnce([
-          { name: 'node_modules', isDirectory: () => true, isFile: () => false },
+          {
+            name: 'node_modules',
+            isDirectory: () => true,
+            isFile: () => false,
+          },
           { name: '.git', isDirectory: () => true, isFile: () => false },
           { name: 'dist', isDirectory: () => true, isFile: () => false },
           { name: 'src', isDirectory: () => true, isFile: () => false },
@@ -281,7 +288,11 @@ describe('FileSystemScannerService', () => {
 
       mockFs.readdirSync.mockReturnValueOnce([
         { name: 'file1.ts', isDirectory: () => false, isFile: () => true },
-        { name: 'package-lock.json', isDirectory: () => false, isFile: () => true },
+        {
+          name: 'package-lock.json',
+          isDirectory: () => false,
+          isFile: () => true,
+        },
         { name: 'yarn.lock', isDirectory: () => false, isFile: () => true },
         { name: 'file2.js', isDirectory: () => false, isFile: () => true },
         { name: 'Cargo.lock', isDirectory: () => false, isFile: () => true },
