@@ -274,5 +274,28 @@ describe('FileSystemScannerService', () => {
       expect(analyzer1.getFiles()[0].content).toBe('shared content');
       expect(analyzer2.getFiles()[0].content).toBe('shared content');
     });
+
+    it('should skip system and package lock files', () => {
+      const mockAnalyzer = new MockAnalyzer();
+      const mockFs = fs as jest.Mocked<typeof fs>;
+
+      mockFs.readdirSync.mockReturnValueOnce([
+        { name: 'file1.ts', isDirectory: () => false, isFile: () => true },
+        { name: 'package-lock.json', isDirectory: () => false, isFile: () => true },
+        { name: 'yarn.lock', isDirectory: () => false, isFile: () => true },
+        { name: 'file2.js', isDirectory: () => false, isFile: () => true },
+        { name: 'Cargo.lock', isDirectory: () => false, isFile: () => true },
+        { name: '.DS_Store', isDirectory: () => false, isFile: () => true },
+      ] as any);
+
+      mockFs.readFileSync.mockReturnValue('content');
+
+      service.scanRepository('/test/repo', [mockAnalyzer]);
+
+      const files = mockAnalyzer.getFiles();
+      expect(files).toHaveLength(2);
+      expect(files[0].path).toContain('file1.ts');
+      expect(files[1].path).toContain('file2.js');
+    });
   });
 });

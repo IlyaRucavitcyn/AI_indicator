@@ -43,6 +43,20 @@ export class FileSystemScannerService {
     'target',
   ];
 
+  private readonly SKIP_FILES = [
+    'package-lock.json',
+    'yarn.lock',
+    'pnpm-lock.yaml',
+    'composer.lock',
+    'Gemfile.lock',
+    'Pipfile.lock',
+    'poetry.lock',
+    'Cargo.lock',
+    'go.sum',
+    '.DS_Store',
+    'thumbs.db',
+  ];
+
   /**
    * Scans repository and passes files to all registered analyzers
    * @param repoPath Path to the repository
@@ -124,7 +138,10 @@ export class FileSystemScannerService {
 
           if (entry.isFile()) {
             const ext = path.extname(entry.name);
-            return supportedExtensions.includes(ext) ? [fullPath] : [];
+            return supportedExtensions.includes(ext) &&
+              !this.shouldSkipFile(entry.name)
+              ? [fullPath]
+              : [];
           }
 
           return [];
@@ -144,5 +161,14 @@ export class FileSystemScannerService {
    */
   private shouldSkipDirectory(dirName: string): boolean {
     return this.SKIP_DIRECTORIES.includes(dirName) || dirName.startsWith('.');
+  }
+
+  /**
+   * Checks if a file should be skipped during analysis
+   * @param fileName File name
+   * @returns True if file should be skipped
+   */
+  private shouldSkipFile(fileName: string): boolean {
+    return this.SKIP_FILES.includes(fileName);
   }
 }
