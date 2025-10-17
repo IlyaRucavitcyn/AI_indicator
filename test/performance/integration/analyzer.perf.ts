@@ -1,8 +1,5 @@
 import 'reflect-metadata';
 import { Bench } from 'tinybench';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
 import { AnalyzerService } from '../../../src/git-analyze/services/analyzer.service';
 import { GitService } from '../../../src/git-analyze/services/git.service';
 import { TempService } from '../../../src/git-analyze/services/temp.service';
@@ -12,88 +9,15 @@ import { GitMessagesService } from '../../../src/git-analyze/services/metrics/ai
 import { GitTimingService } from '../../../src/git-analyze/services/metrics/ai-indicators/git-timing.service';
 import { CodeQualityService } from '../../../src/git-analyze/services/metrics/ai-indicators/code-quality.service';
 import { CodeCommentAnalysisService } from '../../../src/git-analyze/services/metrics/ai-indicators/code-comment-analysis.service';
+import { CodeNonTypicalExpressionsService } from '../../../src/git-analyze/services/metrics/ai-indicators/code-non-typical-expressions.service';
+import { FileSystemScannerService } from '../../../src/git-analyze/services/metrics/ai-indicators/file-system-scanner.service';
 import { GitMetrics } from '../../../src/git-analyze/routes/dto/analyze-response.dto';
 import {
   MockDataGenerator,
+  MockRepositoryGenerator,
   PERFORMANCE_THRESHOLDS,
   formatBenchmarkResults,
 } from '../utils/performance-helpers';
-
-/**
- * Creates a temporary directory with sample source files for testing
- */
-function createMockRepoDirectory(): string {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'perf-test-'));
-
-  // Create a few sample files with varying amounts of code and comments
-  const files = [
-    {
-      name: 'index.ts',
-      content: `// Main entry point
-import { App } from './app';
-
-/**
- * Initialize application
- */
-function main() {
-  const app = new App();
-  app.start();
-}
-
-main();
-`,
-    },
-    {
-      name: 'app.ts',
-      content: `export class App {
-  // Application instance
-  private isRunning = false;
-
-  /**
-   * Starts the application
-   */
-  start() {
-    this.isRunning = true;
-    console.log('App started');
-  }
-
-  stop() {
-    this.isRunning = false;
-  }
-}
-`,
-    },
-    {
-      name: 'utils.ts',
-      content: `// Utility functions
-export function add(a: number, b: number): number {
-  return a + b;
-}
-
-export function subtract(a: number, b: number): number {
-  return a - b;
-}
-`,
-    },
-  ];
-
-  files.forEach(({ name, content }) => {
-    fs.writeFileSync(path.join(tempDir, name), content);
-  });
-
-  return tempDir;
-}
-
-/**
- * Cleans up temporary directory
- */
-function cleanupMockRepo(repoPath: string) {
-  try {
-    fs.rmSync(repoPath, { recursive: true, force: true });
-  } catch {
-    // Ignore cleanup errors
-  }
-}
 
 /**
  * Suppresses console output during benchmark execution
@@ -113,7 +37,14 @@ function suppressConsoleOutput() {
 
 async function runBenchmarks() {
   // Create mock repository directory for code comment analysis
-  const mockRepoPath = createMockRepoDirectory();
+  console.log('Creating mock repository for integration tests...');
+  const mockRepoPath = MockRepositoryGenerator.createMockRepository({
+    fileCount: 50,
+    maxDepth: 3,
+    fileTypes: ['.ts', '.js'],
+    avgFileSize: 'medium',
+    includeNonTypicalCode: true,
+  });
 
   try {
     // Manually instantiate services (no NestJS DI in standalone script)
@@ -124,7 +55,10 @@ async function runBenchmarks() {
     const gitMessagesService = new GitMessagesService();
     const gitTimingService = new GitTimingService();
     const codeQualityService = new CodeQualityService();
+    const fileSystemScannerService = new FileSystemScannerService();
     const codeCommentAnalysisService = new CodeCommentAnalysisService();
+    const codeNonTypicalExpressionsService =
+      new CodeNonTypicalExpressionsService();
 
     const analyzerService = new AnalyzerService(
       gitService,
@@ -134,7 +68,9 @@ async function runBenchmarks() {
       gitMessagesService,
       gitTimingService,
       codeQualityService,
+      fileSystemScannerService,
       codeCommentAnalysisService,
+      codeNonTypicalExpressionsService,
     );
 
     console.log('\n========================================');
@@ -275,7 +211,7 @@ async function runBenchmarks() {
     console.log('\n✅ All benchmarks completed successfully!\n');
   } finally {
     // Cleanup mock repository
-    cleanupMockRepo(mockRepoPath);
+    MockRepositoryGenerator.cleanupMockRepository(mockRepoPath);
   }
 }
 

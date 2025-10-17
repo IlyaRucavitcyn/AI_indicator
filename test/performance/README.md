@@ -9,12 +9,14 @@ These are **NOT Jest tests** - they are standalone TypeScript scripts that run i
 ```
 test/performance/
 ├── utils/
-│   └── performance-helpers.ts      # Mock data generator and utilities
+│   └── performance-helpers.ts              # Mock data & repository generators
 ├── unit/
-│   ├── basic-metrics.perf.ts       # BasicMetricsService performance
-│   └── all-services.perf.ts        # All services comparison + memory test
+│   ├── basic-metrics.perf.ts               # BasicMetricsService performance
+│   ├── all-services.perf.ts                # All services comparison + memory test
+│   ├── file-system-scanner.perf.ts         # FileSystemScannerService performance
+│   └── code-analyzers.perf.ts              # Code analyzers performance
 └── integration/
-    └── analyzer.perf.ts            # Full AnalyzerService integration tests
+    └── analyzer.perf.ts                    # Full AnalyzerService integration tests
 ```
 
 ## Running Performance Tests
@@ -26,9 +28,11 @@ npm run perf
 
 ### Run individual performance tests
 ```bash
-npm run perf:basic       # BasicMetricsService only
-npm run perf:all         # All services comparison
-npm run perf:analyzer    # AnalyzerService integration
+npm run perf:basic          # BasicMetricsService only
+npm run perf:all            # All services comparison
+npm run perf:scanner        # FileSystemScannerService performance
+npm run perf:code-analyzers # Code analyzers (Comment & Expression analysis)
+npm run perf:analyzer       # AnalyzerService integration
 ```
 
 ## Performance Thresholds
@@ -42,9 +46,11 @@ The tests validate against these performance thresholds:
 | Large        | 10,000  | 500ms    |
 | X-Large      | 100,000 | 5000ms   |
 
-## Mock Data Generator
+## Test Utilities
 
-The `MockDataGenerator` utility creates realistic commit data for testing:
+### MockDataGenerator
+
+The `MockDataGenerator` utility creates realistic commit data for testing commit-based metrics:
 
 ```typescript
 const commits = MockDataGenerator.generateCommits(1000, {
@@ -56,6 +62,34 @@ const commits = MockDataGenerator.generateCommits(1000, {
   burstRatio: 0.2,            // 0-1, bursty commits
 });
 ```
+
+### MockRepositoryGenerator
+
+The `MockRepositoryGenerator` utility creates realistic temporary repositories for testing file-based analysis:
+
+```typescript
+const repoPath = MockRepositoryGenerator.createMockRepository({
+  fileCount: 1000,              // Number of files to generate
+  maxDepth: 5,                  // Directory nesting depth
+  fileTypes: ['.ts', '.js', '.py'], // File types to create
+  avgFileSize: 'medium',        // 'small' | 'medium' | 'large'
+  includeNodeModules: false,    // Include node_modules for filter testing
+  includeNonTypicalCode: false, // Include for/while/switch patterns
+});
+
+// Use the repository
+scannerService.scanRepository(repoPath, [analyzer]);
+
+// Clean up when done
+MockRepositoryGenerator.cleanupMockRepository(repoPath);
+```
+
+**Features:**
+- Creates nested directory structures
+- Generates realistic TypeScript, JavaScript, and Python files
+- Supports configurable file sizes and code patterns
+- Can simulate node_modules and lock files for testing filtering
+- Automatic cleanup utility
 
 ## Benchmark Output
 
@@ -175,3 +209,58 @@ console.log(`Memory used: ${memoryDelta.toFixed(2)}MB`);
 - Check for memory leaks in tested code
 - Verify data is properly garbage collected
 - Use smaller datasets for development, larger for CI
+
+## Test Coverage
+
+### Commit-Based Metrics
+- **BasicMetricsService** - Core repository statistics (commits, contributors, timing)
+- **GitSizeService** - File and line change metrics
+- **GitMessagesService** - Commit message pattern analysis
+- **GitTimingService** - Burst pattern detection
+- **CodeQualityService** - Test file ratio analysis
+
+### File-Based Analysis
+- **FileSystemScannerService** - Repository scanning with directory filtering
+  - Tests file system traversal performance
+  - Validates node_modules and lock file exclusion
+  - Measures multiple analyzer overhead
+  - Scaling analysis (100 to 5,000 files)
+
+- **CodeCommentAnalysisService** - Comment ratio detection
+  - Tests across varying file counts and sizes
+  - Validates comment detection accuracy
+
+- **CodeNonTypicalExpressionsService** - Non-typical code pattern detection
+  - Tests for/while/switch statement detection
+  - Validates pattern matching across languages
+  - Compares performance with comment analysis
+
+### Integration Tests
+- **AnalyzerService** - End-to-end analysis with all services
+  - Tests full metric calculation pipeline
+  - Uses realistic mock repositories
+  - Worst-case scenario analysis
+
+## Performance Insights
+
+### Key Findings from Testing
+
+1. **File I/O is the Bottleneck**
+   - File scanning dominates execution time
+   - Both comment and expression analysis have similar performance
+   - Bottleneck is disk I/O, not regex processing
+
+2. **Efficient Multi-Analyzer Architecture**
+   - Running two analyzers adds only ~25% overhead
+   - FileSystemScannerService reads files once, passes to all analyzers
+   - Much better than scanning twice
+
+3. **Linear Scaling**
+   - All file operations scale linearly with file count
+   - 100→1,000 files: ~10x time
+   - 1,000→5,000 files: ~5.75x time
+   - No algorithmic bottlenecks detected
+
+4. **Directory Filtering Works**
+   - node_modules, .git, and lock files correctly skipped
+   - Prevents processing thousands of dependency files

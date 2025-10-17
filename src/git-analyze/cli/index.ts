@@ -13,6 +13,8 @@ import { GitMessagesService } from '../services/metrics/ai-indicators/git-messag
 import { GitTimingService } from '../services/metrics/ai-indicators/git-timing.service';
 import { CodeQualityService } from '../services/metrics/ai-indicators/code-quality.service';
 import { CodeCommentAnalysisService } from '../services/metrics/ai-indicators/code-comment-analysis.service';
+import { CodeNonTypicalExpressionsService } from '../services/metrics/ai-indicators/code-non-typical-expressions.service';
+import { FileSystemScannerService } from '../services/metrics/ai-indicators/file-system-scanner.service';
 import { ConsoleFormatter } from './formatters/console.formatter';
 import { JsonFormatter } from './formatters/json.formatter';
 import { HtmlFormatter } from './formatters/html.formatter';
@@ -75,7 +77,10 @@ program
         const gitMessagesService = new GitMessagesService();
         const gitTimingService = new GitTimingService();
         const codeQualityService = new CodeQualityService();
+        const fileSystemScannerService = new FileSystemScannerService();
         const codeCommentAnalysisService = new CodeCommentAnalysisService();
+        const codeNonTypicalExpressionsService =
+          new CodeNonTypicalExpressionsService();
         const analyzerService = new AnalyzerService(
           gitService,
           tempService,
@@ -84,7 +89,9 @@ program
           gitMessagesService,
           gitTimingService,
           codeQualityService,
+          fileSystemScannerService,
           codeCommentAnalysisService,
+          codeNonTypicalExpressionsService,
         );
 
         // Perform analysis

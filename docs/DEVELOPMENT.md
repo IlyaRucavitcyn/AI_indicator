@@ -369,6 +369,37 @@ Coverage reports are generated in `coverage/` directory. Open `coverage/lcov-rep
 - Functions: > 80%
 - Lines: > 80%
 
+### Performance Tests
+
+Performance tests use [tinybench](https://github.com/tinylibs/tinybench) for accurate benchmarking:
+
+```bash
+# Run all performance tests
+npm run perf
+
+# Run individual test suites
+npm run perf:basic          # BasicMetricsService
+npm run perf:all            # All services comparison
+npm run perf:scanner        # FileSystemScannerService
+npm run perf:code-analyzers # Code analyzers (Comment & Expression)
+npm run perf:analyzer       # Full integration tests
+```
+
+**Performance test files** (located in `test/performance/`):
+- `unit/basic-metrics.perf.ts` - Commit-based metrics performance
+- `unit/all-services.perf.ts` - Service comparison and memory tests
+- `unit/file-system-scanner.perf.ts` - File scanning performance
+- `unit/code-analyzers.perf.ts` - Code analysis performance
+- `integration/analyzer.perf.ts` - Full integration benchmarks
+
+**When to run**:
+- Before committing changes that affect performance
+- After adding new analyzers or services
+- When investigating performance issues
+- As part of CI/CD pipeline
+
+See `test/performance/README.md` for detailed documentation.
+
 ---
 
 ## Building
