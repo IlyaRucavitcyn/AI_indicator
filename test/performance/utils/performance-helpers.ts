@@ -453,7 +453,11 @@ class DataAnalyzer:
     for (let depth = 0; depth < Math.min(maxDepth, 10); depth++) {
       const dirsAtThisLevel = Math.ceil(dirCount / (depth + 1));
 
-      for (let dirIdx = 0; dirIdx < dirsAtThisLevel && filesCreated < fileCount; dirIdx++) {
+      for (
+        let dirIdx = 0;
+        dirIdx < dirsAtThisLevel && filesCreated < fileCount;
+        dirIdx++
+      ) {
         const dirPath = this.createNestedPath(tempDir, depth, dirIdx);
         fs.mkdirSync(dirPath, { recursive: true });
 
@@ -461,7 +465,8 @@ class DataAnalyzer:
         const filesToCreate = Math.min(filesPerDir, fileCount - filesCreated);
 
         for (let fileIdx = 0; fileIdx < filesToCreate; fileIdx++) {
-          const fileType = fileTypes[Math.floor(Math.random() * fileTypes.length)];
+          const fileType =
+            fileTypes[Math.floor(Math.random() * fileTypes.length)];
           const fileName = `file${filesCreated}${fileType}`;
           const filePath = path.join(dirPath, fileName);
 
@@ -528,29 +533,25 @@ class DataAnalyzer:
     const lang = this.getLanguageFromExtension(fileType);
     const samples = this.CODE_SAMPLES[lang];
 
-    let content = '';
-
-    switch (size) {
-      case 'small':
-        content = includeNonTypical && samples.withLoops
+    const contentGenerators = {
+      small: () =>
+        includeNonTypical && samples.withLoops
           ? samples.withLoops
-          : samples.simple;
-        break;
-      case 'medium':
-        content = includeNonTypical && samples.withLoops
+          : samples.simple,
+      medium: () =>
+        includeNonTypical && samples.withLoops
           ? samples.simple + '\n\n' + samples.withLoops
-          : samples.simple + '\n\n' + samples.complex;
-        break;
-      case 'large':
-        // Repeat content to make it larger
-        const baseContent = includeNonTypical && samples.withLoops
-          ? samples.withLoops
-          : samples.complex;
-        content = baseContent + '\n\n' + baseContent + '\n\n' + samples.simple;
-        break;
-    }
+          : samples.simple + '\n\n' + samples.complex,
+      large: () => {
+        const baseContent =
+          includeNonTypical && samples.withLoops
+            ? samples.withLoops
+            : samples.complex;
+        return baseContent + '\n\n' + baseContent + '\n\n' + samples.simple;
+      },
+    };
 
-    return content;
+    return contentGenerators[size]();
   }
 
   /**
