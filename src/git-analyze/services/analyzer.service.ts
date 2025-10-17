@@ -11,6 +11,8 @@ import { GitMessagesService } from './metrics/ai-indicators/git-messages.service
 import { GitTimingService } from './metrics/ai-indicators/git-timing.service';
 import { CodeQualityService } from './metrics/ai-indicators/code-quality.service';
 import { CodeCommentAnalysisService } from './metrics/ai-indicators/code-comment-analysis.service';
+import { CodeNonTypicalExpressionsService } from './metrics/ai-indicators/code-non-typical-expressions.service';
+import { FileSystemScannerService } from './metrics/ai-indicators/file-system-scanner.service';
 import { METRIC_DESCRIPTIONS } from './metrics/metric-thresholds.constants';
 
 @Injectable()
@@ -23,7 +25,9 @@ export class AnalyzerService {
     private readonly gitMessagesService: GitMessagesService,
     private readonly gitTimingService: GitTimingService,
     private readonly codeQualityService: CodeQualityService,
+    private readonly fileSystemScannerService: FileSystemScannerService,
     private readonly codeCommentAnalysisService: CodeCommentAnalysisService,
+    private readonly codeNonTypicalExpressionsService: CodeNonTypicalExpressionsService,
   ) {}
 
   /**
@@ -132,26 +136,30 @@ export class AnalyzerService {
       this.gitTimingService.analyzeBurstyCommits(commits);
     const testFileRatio = this.codeQualityService.analyzeTestFileRatio(commits);
 
-    // Code comment analysis with progress indication
-    console.log('📝 Analyzing code comments...');
+    // File-based analysis with unified scanning (comments + non-typical expressions)
+    console.log('📝 Analyzing source files...');
     let lastProgress = 0;
-    const codeCommentRatio =
-      this.codeCommentAnalysisService.analyzeCommentRatio(
-        repoPath,
-        (current, total) => {
-          const progress = Math.floor((current / total) * 100);
-          // Only update every 10% to avoid too much output
-          if (progress >= lastProgress + 10 || current === total) {
-            process.stdout.write(
-              `\r📝 Analyzing code comments... ${current}/${total} files (${progress}%)`,
-            );
-            lastProgress = progress;
-            if (current === total) {
-              process.stdout.write('\n');
-            }
+    this.fileSystemScannerService.scanRepository(
+      repoPath,
+      [this.codeCommentAnalysisService, this.codeNonTypicalExpressionsService],
+      (current, total) => {
+        const progress = Math.floor((current / total) * 100);
+        // Only update every 10% to avoid too much output
+        if (progress >= lastProgress + 10 || current === total) {
+          process.stdout.write(
+            `\r📝 Analyzing source files... ${current}/${total} files (${progress}%)`,
+          );
+          lastProgress = progress;
+          if (current === total) {
+            process.stdout.write('\n');
           }
-        },
-      );
+        }
+      },
+    );
+
+    const codeCommentRatio = this.codeCommentAnalysisService.getResult();
+    const codeNonTypicalExpressionRatio =
+      this.codeNonTypicalExpressionsService.getResult();
 
     return {
       ...basicMetrics,
@@ -187,6 +195,10 @@ export class AnalyzerService {
         codeCommentRatio: {
           value: codeCommentRatio,
           description: METRIC_DESCRIPTIONS.codeCommentRatio(),
+        },
+        codeNonTypicalExpressionRatio: {
+          value: codeNonTypicalExpressionRatio,
+          description: METRIC_DESCRIPTIONS.codeNonTypicalExpressionRatio(),
         },
       },
     };

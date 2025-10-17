@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
+import { FileAnalyzer } from './file-system-scanner.service';
+import { LanguageUtils } from './language-utils';
 
 export interface CommentAnalysisResult {
   totalLines: number;
@@ -9,131 +9,52 @@ export interface CommentAnalysisResult {
 }
 
 @Injectable()
-export class CodeCommentAnalysisService {
-  private readonly SUPPORTED_EXTENSIONS = [
-    '.ts',
-    '.js',
-    '.tsx',
-    '.jsx',
-    '.py',
-    '.java',
-    '.go',
-    '.rs',
-    '.c',
-    '.cpp',
-    '.cs',
-    '.php',
-    '.rb',
-    '.swift',
-    '.kt',
-  ];
+export class CodeCommentAnalysisService implements FileAnalyzer {
+  // State maintained during scanning
+  private totalLines = 0;
+  private codeLines = 0;
+  private commentLines = 0;
 
   /**
-   * Analyzes comment ratio in repository files
-   * @param repoPath Path to the cloned repository
-   * @param onProgress Optional callback for progress updates
+   * Resets analyzer state before a new scan
+   */
+  reset(): void {
+    this.totalLines = 0;
+    this.codeLines = 0;
+    this.commentLines = 0;
+  }
+
+  /**
+   * Gets supported file extensions
+   */
+  getSupportedExtensions(): string[] {
+    return LanguageUtils.getSupportedExtensions();
+  }
+
+  /**
+   * Analyzes a single file for comments (called by FileSystemScannerService)
+   * @param filePath Path to the file
+   * @param content File content
+   * @param extension File extension
+   */
+  analyzeFile(filePath: string, content: string, extension: string): void {
+    const lines = content.split('\n');
+    const result = this.countComments(lines, extension);
+
+    this.totalLines += result.totalLines;
+    this.codeLines += result.codeLines;
+    this.commentLines += result.commentLines;
+  }
+
+  /**
+   * Gets the calculated comment ratio
    * @returns Comment ratio as percentage
    */
-  analyzeCommentRatio(
-    repoPath: string,
-    onProgress?: (current: number, total: number) => void,
-  ): number {
-    const files = this.getAllSourceFiles(repoPath);
-    const results = files.map((file, index) => {
-      if (onProgress) {
-        onProgress(index + 1, files.length);
-      }
-      return this.analyzeFile(file);
-    });
-
-    const totals = results.reduce(
-      (acc, result) => ({
-        totalLines: acc.totalLines + result.totalLines,
-        codeLines: acc.codeLines + result.codeLines,
-        commentLines: acc.commentLines + result.commentLines,
-      }),
-      { totalLines: 0, codeLines: 0, commentLines: 0 },
-    );
-
-    if (totals.codeLines === 0) {
+  getResult(): number {
+    if (this.codeLines === 0) {
       return 0;
     }
-
-    return Math.round((totals.commentLines / totals.codeLines) * 10000) / 100;
-  }
-
-  /**
-   * Gets all source files from directory tree
-   * @param rootPath Root directory path
-   * @returns Array of file paths
-   */
-  private getAllSourceFiles(rootPath: string): string[] {
-    const collectFiles = (dirPath: string): string[] => {
-      try {
-        const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-
-        return entries.flatMap((entry): string[] => {
-          const fullPath = path.join(dirPath, entry.name);
-
-          if (entry.isDirectory()) {
-            return this.shouldSkipDirectory(entry.name)
-              ? []
-              : collectFiles(fullPath);
-          }
-
-          if (entry.isFile()) {
-            const ext = path.extname(entry.name);
-            return this.SUPPORTED_EXTENSIONS.includes(ext) ? [fullPath] : [];
-          }
-
-          return [];
-        });
-      } catch {
-        return [];
-      }
-    };
-
-    return collectFiles(rootPath);
-  }
-
-  /**
-   * Checks if a directory should be skipped
-   * @param dirName Directory name
-   * @returns True if directory should be skipped
-   */
-  private shouldSkipDirectory(dirName: string): boolean {
-    const skipDirs = [
-      'node_modules',
-      '.git',
-      'dist',
-      'build',
-      'coverage',
-      '.next',
-      '.nuxt',
-      'vendor',
-      '__pycache__',
-      '.venv',
-      'venv',
-      'target',
-    ];
-    return skipDirs.includes(dirName) || dirName.startsWith('.');
-  }
-
-  /**
-   * Analyzes a single file for comments
-   * @param filePath Path to the file
-   * @returns Comment analysis result for the file
-   */
-  private analyzeFile(filePath: string): CommentAnalysisResult {
-    try {
-      const ext = path.extname(filePath);
-      const content = fs.readFileSync(filePath, 'utf-8');
-      const lines = content.split('\n');
-
-      return this.countComments(lines, ext);
-    } catch {
-      return { totalLines: 0, codeLines: 0, commentLines: 0 };
-    }
+    return Math.round((this.commentLines / this.codeLines) * 10000) / 100;
   }
 
   /**
@@ -143,7 +64,7 @@ export class CodeCommentAnalysisService {
    * @returns Line counts
    */
   private countComments(lines: string[], ext: string): CommentAnalysisResult {
-    const commentSyntax = this.getCommentSyntax(ext);
+    const commentSyntax = LanguageUtils.getCommentSyntax(ext);
     const totalLines = lines.length;
 
     const { codeLines, commentLines } = lines.reduce(
@@ -189,49 +110,5 @@ export class CodeCommentAnalysisService {
     );
 
     return { totalLines, codeLines, commentLines };
-  }
-
-  /**
-   * Gets comment syntax for a file extension
-   * @param ext File extension
-   * @returns Comment syntax configuration
-   */
-  private getCommentSyntax(ext: string): {
-    single: string;
-    blockStart?: string;
-    blockEnd?: string;
-  } {
-    // C-style comments (JS, TS, Java, Go, C, C++, C#, Rust, Swift, Kotlin, PHP)
-    const cStyleExts = [
-      '.ts',
-      '.js',
-      '.tsx',
-      '.jsx',
-      '.java',
-      '.go',
-      '.c',
-      '.cpp',
-      '.cs',
-      '.rs',
-      '.swift',
-      '.kt',
-      '.php',
-    ];
-    if (cStyleExts.includes(ext)) {
-      return { single: '//', blockStart: '/*', blockEnd: '*/' };
-    }
-
-    // Python
-    if (ext === '.py') {
-      return { single: '#', blockStart: '"""', blockEnd: '"""' };
-    }
-
-    // Ruby
-    if (ext === '.rb') {
-      return { single: '#', blockStart: '=begin', blockEnd: '=end' };
-    }
-
-    // Default to # for single-line comments
-    return { single: '#' };
   }
 }

@@ -8,6 +8,8 @@ import { GitMessagesService } from './metrics/ai-indicators/git-messages.service
 import { GitTimingService } from './metrics/ai-indicators/git-timing.service';
 import { CodeQualityService } from './metrics/ai-indicators/code-quality.service';
 import { CodeCommentAnalysisService } from './metrics/ai-indicators/code-comment-analysis.service';
+import { CodeNonTypicalExpressionsService } from './metrics/ai-indicators/code-non-typical-expressions.service';
+import { FileSystemScannerService } from './metrics/ai-indicators/file-system-scanner.service';
 
 describe('AnalyzerService', () => {
   let service: AnalyzerService;
@@ -18,7 +20,9 @@ describe('AnalyzerService', () => {
   let gitMessagesService: GitMessagesService;
   let gitTimingService: GitTimingService;
   let codeQualityService: CodeQualityService;
+  let fileSystemScannerService: FileSystemScannerService;
   let codeCommentAnalysisService: CodeCommentAnalysisService;
+  let codeNonTypicalExpressionsService: CodeNonTypicalExpressionsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -31,7 +35,9 @@ describe('AnalyzerService', () => {
         GitMessagesService,
         GitTimingService,
         CodeQualityService,
+        FileSystemScannerService,
         CodeCommentAnalysisService,
+        CodeNonTypicalExpressionsService,
       ],
     }).compile();
 
@@ -43,9 +49,16 @@ describe('AnalyzerService', () => {
     gitMessagesService = module.get<GitMessagesService>(GitMessagesService);
     gitTimingService = module.get<GitTimingService>(GitTimingService);
     codeQualityService = module.get<CodeQualityService>(CodeQualityService);
+    fileSystemScannerService = module.get<FileSystemScannerService>(
+      FileSystemScannerService,
+    );
     codeCommentAnalysisService = module.get<CodeCommentAnalysisService>(
       CodeCommentAnalysisService,
     );
+    codeNonTypicalExpressionsService =
+      module.get<CodeNonTypicalExpressionsService>(
+        CodeNonTypicalExpressionsService,
+      );
   });
 
   afterEach(() => {
@@ -177,6 +190,10 @@ describe('AnalyzerService', () => {
               value: 0,
               description: expect.any(String),
             },
+            codeNonTypicalExpressionRatio: {
+              value: 0,
+              description: expect.any(String),
+            },
           },
         },
         analyzedAt: expect.any(String),
@@ -265,6 +282,10 @@ describe('AnalyzerService', () => {
             value: 0,
             description: expect.any(String),
           },
+          codeNonTypicalExpressionRatio: {
+            value: 0,
+            description: expect.any(String),
+          },
         },
       });
     });
@@ -332,9 +353,11 @@ describe('AnalyzerService', () => {
         .mockReturnValue(0);
       jest.spyOn(gitTimingService, 'analyzeBurstyCommits').mockReturnValue(0);
       jest.spyOn(codeQualityService, 'analyzeTestFileRatio').mockReturnValue(0);
-      jest
-        .spyOn(codeCommentAnalysisService, 'analyzeCommentRatio')
-        .mockReturnValue(0);
+
+      // Mock the new file-based architecture
+      jest.spyOn(fileSystemScannerService, 'scanRepository').mockImplementation(() => {});
+      jest.spyOn(codeCommentAnalysisService, 'getResult').mockReturnValue(0);
+      jest.spyOn(codeNonTypicalExpressionsService, 'getResult').mockReturnValue(0);
 
       const metrics = (service as any).calculateMetrics(
         commits,
@@ -355,9 +378,13 @@ describe('AnalyzerService', () => {
       expect(codeQualityService.analyzeTestFileRatio).toHaveBeenCalledWith(
         commits,
       );
-      expect(
-        codeCommentAnalysisService.analyzeCommentRatio,
-      ).toHaveBeenCalledWith('/tmp/test-repo', expect.any(Function));
+      expect(fileSystemScannerService.scanRepository).toHaveBeenCalledWith(
+        '/tmp/test-repo',
+        [codeCommentAnalysisService, codeNonTypicalExpressionsService],
+        expect.any(Function),
+      );
+      expect(codeCommentAnalysisService.getResult).toHaveBeenCalled();
+      expect(codeNonTypicalExpressionsService.getResult).toHaveBeenCalled();
 
       // Verify the structure is correct
       expect(metrics).toEqual({
@@ -408,6 +435,10 @@ describe('AnalyzerService', () => {
             description: expect.any(String),
           },
           codeCommentRatio: {
+            value: 0,
+            description: expect.any(String),
+          },
+          codeNonTypicalExpressionRatio: {
             value: 0,
             description: expect.any(String),
           },

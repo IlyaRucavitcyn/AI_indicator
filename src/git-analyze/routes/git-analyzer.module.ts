@@ -9,6 +9,8 @@ import { GitMessagesService } from '../services/metrics/ai-indicators/git-messag
 import { GitTimingService } from '../services/metrics/ai-indicators/git-timing.service';
 import { CodeQualityService } from '../services/metrics/ai-indicators/code-quality.service';
 import { CodeCommentAnalysisService } from '../services/metrics/ai-indicators/code-comment-analysis.service';
+import { CodeNonTypicalExpressionsService } from '../services/metrics/ai-indicators/code-non-typical-expressions.service';
+import { FileSystemScannerService } from '../services/metrics/ai-indicators/file-system-scanner.service';
 
 @Module({
   controllers: [GitAnalyzerController],
@@ -21,7 +23,9 @@ import { CodeCommentAnalysisService } from '../services/metrics/ai-indicators/co
     GitMessagesService,
     GitTimingService,
     CodeQualityService,
+    FileSystemScannerService,
     CodeCommentAnalysisService,
+    CodeNonTypicalExpressionsService,
   ],
   exports: [AnalyzerService],
 })

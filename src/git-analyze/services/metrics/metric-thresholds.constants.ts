@@ -22,6 +22,9 @@ export const METRIC_THRESHOLDS = {
 
   // Code Comment Ratio
   HIGH_COMMENT_RATIO_THRESHOLD: 30, // Percentage threshold for excessive comments
+
+  // Non-Typical Expressions
+  HIGH_NON_TYPICAL_EXPRESSION_THRESHOLD: 30, // Percentage threshold for non-typical code patterns
 } as const;
 
 /**
@@ -51,4 +54,7 @@ export const METRIC_DESCRIPTIONS = {
 
   codeCommentRatio: () =>
     `Percentage of comment lines relative to code lines. High values (>${METRIC_THRESHOLDS.HIGH_COMMENT_RATIO_THRESHOLD}%) may indicate AI-generated code with excessive explanatory comments.`,
+
+  codeNonTypicalExpressionRatio: () =>
+    `Percentage of files containing non-typical expressions (for/while loops, switch statements). High values (>${METRIC_THRESHOLDS.HIGH_NON_TYPICAL_EXPRESSION_THRESHOLD}%) may suggest AI-generated code using outdated patterns instead of modern declarative approaches.`,
 } as const;

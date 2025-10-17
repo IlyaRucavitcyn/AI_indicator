@@ -129,6 +129,11 @@ export class ConsoleFormatter {
           chalk.bold(`${ai.codeCommentRatio.value}%`),
           chalk.gray(ai.codeCommentRatio.description),
         ],
+        [
+          'Non-typical Expr. %',
+          chalk.bold(`${ai.codeNonTypicalExpressionRatio.value}%`),
+          chalk.gray(ai.codeNonTypicalExpressionRatio.description),
+        ],
       );
 
       aiIndicatorsTable = `\n${chalk.bold.blue('🤖 AI Assistance Indicators:')}\n${aiTable.toString()}`;

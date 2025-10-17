@@ -365,6 +365,14 @@ export class HtmlFormatter {
             </div>
             <div class="ai-metric-description">${ai.codeCommentRatio.description}</div>
         </div>
+
+        <div class="ai-metric">
+            <div class="ai-metric-header">
+                <span class="ai-metric-name">Non-typical Expressions %</span>
+                <span class="ai-metric-value">${ai.codeNonTypicalExpressionRatio.value}%</span>
+            </div>
+            <div class="ai-metric-description">${ai.codeNonTypicalExpressionRatio.description}</div>
+        </div>
     </div>`;
   }
 }
