@@ -25,7 +25,7 @@ describe('BasicMetricsService', () => {
         contributors: 0,
         firstCommit: '',
         lastCommit: '',
-        durationDays: 0,
+        duration: '0 days 0 hours 0 minutes',
         avgCommitsPerDay: 0,
         topContributor: '',
         contributorStats: [],
@@ -75,7 +75,7 @@ describe('BasicMetricsService', () => {
       expect(result.contributors).toBe(2);
       expect(result.firstCommit).toBe('2024-01-01T00:00:00.000Z');
       expect(result.lastCommit).toBe('2024-01-03T00:00:00.000Z');
-      expect(result.durationDays).toBe(2);
+      expect(result.duration).toBe('2 days 0 hours 0 minutes');
       expect(result.avgCommitsPerDay).toBe(1.5);
       expect(result.topContributor).toBe('author1@example.com');
       expect(result.contributorStats).toHaveLength(2);
@@ -153,7 +153,7 @@ describe('BasicMetricsService', () => {
 
       const result = service.calculateBasicMetrics(commits);
 
-      expect(result.durationDays).toBe(1);
+      expect(result.duration).toBe('0 days 12 hours 0 minutes');
       expect(result.avgCommitsPerDay).toBe(2);
     });
   });
