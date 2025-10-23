@@ -29,6 +29,8 @@ export class GitTimingService {
       return timeDiff < this.BURST_WINDOW_MS;
     }).length;
 
-    return Math.round((burstyCommits / (commits.length - 1)) * 10000) / 100;
+    // Convert to percentage and round to 2 decimal places
+    const percentage = (burstyCommits / (commits.length - 1)) * 100;
+    return Math.round(percentage * 100) / 100;
   }
 }
