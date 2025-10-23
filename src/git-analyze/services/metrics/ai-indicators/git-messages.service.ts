@@ -43,8 +43,8 @@ export class GitMessagesService {
       return matchesPattern || isGeneric;
     });
 
-    return (
-      Math.round((suspiciousCommits.length / commits.length) * 10000) / 100
-    );
+    // Convert to percentage and round to 2 decimal places
+    const percentage = (suspiciousCommits.length / commits.length) * 100;
+    return Math.round(percentage * 100) / 100;
   }
 }

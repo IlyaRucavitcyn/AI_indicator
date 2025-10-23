@@ -65,31 +65,21 @@ export class GitSizeService {
       return 0;
     }
 
-    // Calculate mean
-    const totalLines = commits.reduce(
-      (sum, commit) => sum + commit.insertions + commit.deletions,
-      0,
+    const commitSizes = commits.map(
+      (commit) => commit.insertions + commit.deletions,
     );
-    const mean = totalLines / commits.length;
-
-    // Calculate standard deviation
-    const squaredDiffs = commits.map((commit) => {
-      const lines = commit.insertions + commit.deletions;
-      return Math.pow(lines - mean, 2);
-    });
-    const variance =
-      squaredDiffs.reduce((sum, val) => sum + val, 0) / commits.length;
-    const stdDev = Math.sqrt(variance);
+    const { mean, standardDeviation } =
+      this.calculateMeanAndStdDev(commitSizes);
 
     // Count commits that are either:
     // 1. More than N standard deviations above the mean, OR
     // 2. Above the absolute threshold
-    const largeCommits = commits.filter((commit) => {
-      const lines = commit.insertions + commit.deletions;
+    const largeCommits = commitSizes.filter((lines) => {
       return (
         lines >
-          mean + METRIC_THRESHOLDS.LARGE_COMMIT_STD_DEV_MULTIPLIER * stdDev ||
-        lines > METRIC_THRESHOLDS.LARGE_COMMIT_LINES
+          mean +
+            METRIC_THRESHOLDS.LARGE_COMMIT_STD_DEV_MULTIPLIER *
+              standardDeviation || lines > METRIC_THRESHOLDS.LARGE_COMMIT_LINES
       );
     });
 
@@ -97,24 +87,46 @@ export class GitSizeService {
   }
 
   /**
+   * Calculates mean and standard deviation for a set of values
+   * @param values Array of numeric values
+   * @returns Object containing mean and standard deviation
+   */
+  private calculateMeanAndStdDev(values: number[]): {
+    mean: number;
+    standardDeviation: number;
+  } {
+    if (values.length === 0) {
+      return { mean: 0, standardDeviation: 0 };
+    }
+
+    const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+
+    const squaredDiffs = values.map((value) => Math.pow(value - mean, 2));
+    const variance =
+      squaredDiffs.reduce((sum, val) => sum + val, 0) / values.length;
+    const standardDeviation = Math.sqrt(variance);
+
+    return { mean, standardDeviation };
+  }
+
+  /**
    * Analyzes the first commit to detect suspiciously large initial commits
-   * @param commits Array of commit information (sorted by date)
+   * @param sortedCommits Array of commit information sorted by date (ascending)
    * @returns Object with first commit size and whether it's suspicious
    */
-  private analyzeFirstCommit(commits: CommitInfo[]): {
+  private analyzeFirstCommit(sortedCommits: CommitInfo[]): {
     firstCommitLines: number;
     isSuspiciouslyLarge: boolean;
   } {
-    if (commits.length === 0) {
+    if (sortedCommits.length === 0) {
       return { firstCommitLines: 0, isSuspiciouslyLarge: false };
     }
 
-    // Assume commits are already sorted by date
-    const firstCommit = commits[0];
+    const firstCommit = sortedCommits[0];
     const firstCommitLines = firstCommit.insertions + firstCommit.deletions;
 
     // Calculate average of remaining commits (excluding first)
-    if (commits.length === 1) {
+    if (sortedCommits.length === 1) {
       // If only one commit, it's suspicious if it's very large
       return {
         firstCommitLines,
@@ -123,7 +135,7 @@ export class GitSizeService {
       };
     }
 
-    const remainingCommits = commits.slice(1);
+    const remainingCommits = sortedCommits.slice(1);
     const avgRemainingLines =
       remainingCommits.reduce(
         (sum, commit) => sum + commit.insertions + commit.deletions,

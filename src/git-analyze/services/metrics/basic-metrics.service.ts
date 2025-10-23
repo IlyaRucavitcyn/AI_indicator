@@ -7,7 +7,7 @@ export interface BasicMetrics {
   contributors: number;
   firstCommit: string;
   lastCommit: string;
-  durationDays: number;
+  duration: string;
   avgCommitsPerDay: number;
   topContributor: string;
   contributorStats: ContributorStats[];
@@ -27,7 +27,7 @@ export class BasicMetricsService {
         contributors: 0,
         firstCommit: '',
         lastCommit: '',
-        durationDays: 0,
+        duration: '0 days 0 hours 0 minutes',
         avgCommitsPerDay: 0,
         topContributor: '',
         contributorStats: [],
@@ -48,9 +48,10 @@ export class BasicMetricsService {
     // Calculate duration
     const durationMs =
       new Date(lastCommit).getTime() - new Date(firstCommit).getTime();
-    const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
+    const duration = this.formatDuration(durationMs);
 
-    // Calculate average commits per day
+    // Calculate duration in days for avgCommitsPerDay calculation
+    const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
     const avgCommitsPerDay = durationDays > 0 ? totalCommits / durationDays : 0;
 
     // Contributor analysis using reduce with immutable operations
@@ -91,10 +92,25 @@ export class BasicMetricsService {
       contributors,
       firstCommit,
       lastCommit,
-      durationDays,
+      duration,
       avgCommitsPerDay: Math.round(avgCommitsPerDay * 100) / 100,
       topContributor,
       contributorStats,
     };
+  }
+
+  /**
+   * Formats duration in milliseconds to "XX days XX hours XX minutes"
+   * @param durationMs Duration in milliseconds
+   * @returns Formatted duration string
+   */
+  private formatDuration(durationMs: number): string {
+    const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(
+      (durationMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+    const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    return `${days} days ${hours} hours ${minutes} minutes`;
   }
 }

@@ -15,7 +15,7 @@ export const METRIC_THRESHOLDS = {
   FIRST_COMMIT_MULTIPLIER: 3, // Multiple of average for suspicious first commit
 
   // Git Timing Metrics
-  BURST_WINDOW_MINUTES: 30, // Minutes window for bursty commits
+  BURST_WINDOW_MINUTES: 5, // Minutes window for bursty commits
 
   // Test File Ratio
   LOW_TEST_COVERAGE_THRESHOLD: 20, // Percentage threshold for low test coverage

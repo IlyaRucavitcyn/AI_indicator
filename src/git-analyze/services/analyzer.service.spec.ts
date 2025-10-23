@@ -139,7 +139,7 @@ describe('AnalyzerService', () => {
           contributors: 2,
           firstCommit: '2024-01-01T00:00:00.000Z',
           lastCommit: '2024-01-03T00:00:00.000Z',
-          durationDays: 2,
+          duration: '2 days 0 hours 0 minutes',
           avgCommitsPerDay: 1.5,
           topContributor: 'author1@example.com',
           contributorStats: [
@@ -242,7 +242,7 @@ describe('AnalyzerService', () => {
         contributors: 0,
         firstCommit: '',
         lastCommit: '',
-        durationDays: 0,
+        duration: '0 days 0 hours 0 minutes',
         avgCommitsPerDay: 0,
         topContributor: '',
         contributorStats: [],
@@ -326,7 +326,7 @@ describe('AnalyzerService', () => {
         contributors: 1,
         firstCommit: '2024-01-01T00:00:00.000Z',
         lastCommit: '2024-01-01T00:00:00.000Z',
-        durationDays: 1,
+        duration: '0 days 0 hours 0 minutes',
         avgCommitsPerDay: 1,
         topContributor: 'author1@example.com',
         contributorStats: [
@@ -396,7 +396,7 @@ describe('AnalyzerService', () => {
         contributors: 1,
         firstCommit: '2024-01-01T00:00:00.000Z',
         lastCommit: '2024-01-01T00:00:00.000Z',
-        durationDays: 1,
+        duration: '0 days 0 hours 0 minutes',
         avgCommitsPerDay: 1,
         topContributor: 'author1@example.com',
         contributorStats: [

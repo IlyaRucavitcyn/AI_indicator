@@ -194,8 +194,8 @@ export class HtmlFormatter {
 
         <div class="metric-card">
             <h3>📅 Development Duration</h3>
-            <div class="metric-value">${metrics.durationDays}</div>
-            <div class="metric-label">Days of development</div>
+            <div class="metric-value">${metrics.duration}</div>
+            <div class="metric-label">Time span of development</div>
         </div>
 
         <div class="metric-card">

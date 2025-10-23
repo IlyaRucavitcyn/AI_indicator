@@ -25,7 +25,7 @@ export class ConsoleFormatter {
       ['Branch', chalk.yellow(branch)],
       ['Total Commits', chalk.bold(metrics.totalCommits.toString())],
       ['Contributors', chalk.bold(metrics.contributors.toString())],
-      ['Development Duration', chalk.bold(`${metrics.durationDays} days`)],
+      ['Development Duration', chalk.bold(metrics.duration)],
       ['First Commit', chalk.gray(metrics.firstCommit)],
       ['Last Commit', chalk.gray(metrics.lastCommit)],
       ['Avg Commits/Day', chalk.bold(metrics.avgCommitsPerDay.toString())],

@@ -35,7 +35,7 @@ export interface GitMetrics {
   contributors: number;
   firstCommit: string;
   lastCommit: string;
-  durationDays: number;
+  duration: string;
   avgCommitsPerDay: number;
   topContributor: string;
   contributorStats: ContributorStats[];

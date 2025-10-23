@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GitTimingService } from './git-timing.service';
+import { METRIC_THRESHOLDS } from '../metric-thresholds.constants';
 
 describe('GitTimingService', () => {
   let service: GitTimingService;
@@ -41,7 +42,7 @@ describe('GitTimingService', () => {
       expect(result).toBe(0);
     });
 
-    it('should detect commits within 30 minute burst window', () => {
+    it(`should detect commits within ${METRIC_THRESHOLDS.BURST_WINDOW_MINUTES} minute burst window`, () => {
       const commits = [
         {
           hash: 'hash1',
@@ -58,7 +59,7 @@ describe('GitTimingService', () => {
           hash: 'hash2',
           author: 'Author 1',
           email: 'author1@example.com',
-          date: new Date('2024-01-01T10:15:00Z'), // 15 minutes later
+          date: new Date('2024-01-01T10:03:00Z'), // 3 minutes later (within window)
           message: 'Commit 2',
           filesChanged: 3,
           insertions: 30,
@@ -69,7 +70,7 @@ describe('GitTimingService', () => {
           hash: 'hash3',
           author: 'Author 1',
           email: 'author1@example.com',
-          date: new Date('2024-01-01T10:20:00Z'), // 5 minutes after previous
+          date: new Date('2024-01-01T10:07:00Z'), // 4 minutes after previous (within window)
           message: 'Commit 3',
           filesChanged: 2,
           insertions: 20,
@@ -144,7 +145,7 @@ describe('GitTimingService', () => {
           hash: 'hash2',
           author: 'Author 1',
           email: 'author1@example.com',
-          date: new Date('2024-01-01T10:10:00Z'), // 10 min - bursty
+          date: new Date('2024-01-01T10:03:00Z'), // 3 min - within burst window
           message: 'Commit 2',
           filesChanged: 3,
           insertions: 30,
@@ -155,7 +156,7 @@ describe('GitTimingService', () => {
           hash: 'hash3',
           author: 'Author 1',
           email: 'author1@example.com',
-          date: new Date('2024-01-01T12:00:00Z'), // 1h50m - not bursty
+          date: new Date('2024-01-01T12:00:00Z'), // 1h57m - outside burst window
           message: 'Commit 3',
           filesChanged: 2,
           insertions: 20,
@@ -176,7 +177,7 @@ describe('GitTimingService', () => {
           hash: 'hash3',
           author: 'Author 1',
           email: 'author1@example.com',
-          date: new Date('2024-01-01T10:20:00Z'),
+          date: new Date('2024-01-01T10:07:00Z'),
           message: 'Commit 3',
           filesChanged: 2,
           insertions: 20,
@@ -198,7 +199,7 @@ describe('GitTimingService', () => {
           hash: 'hash2',
           author: 'Author 1',
           email: 'author1@example.com',
-          date: new Date('2024-01-01T10:15:00Z'),
+          date: new Date('2024-01-01T10:03:00Z'),
           message: 'Commit 2',
           filesChanged: 3,
           insertions: 30,

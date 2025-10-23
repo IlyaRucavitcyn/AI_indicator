@@ -50,7 +50,7 @@ describe('GitAnalyzerController', () => {
           contributors: 2,
           firstCommit: '2024-01-01T00:00:00.000Z',
           lastCommit: '2024-01-10T00:00:00.000Z',
-          durationDays: 9,
+          duration: '9 days 0 hours 0 minutes',
           avgCommitsPerDay: 1.11,
           topContributor: 'author1@example.com',
           contributorStats: [
